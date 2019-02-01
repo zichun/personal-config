@@ -1,3 +1,10 @@
+function Remove-FCShellCrap {
+    $regex = '\b[A-F0-9]{8}(?:-[A-F0-9]{4}){3}-[A-F0-9]{12}\b';
+    get-item * | ? {$_ -match $regex } | remove-item -recurse;
+
+    write-host "Remember to delete the zip files";
+}
+
 function car($arr) {
     $first, $null = $arr;
     return $first;
@@ -596,6 +603,57 @@ function Invoke-MenuSelection
         [string[]]$Options
     )
 
+    try
+    {
+        return Invoke-MenuSelectionCurses -Options $Options;
+    }
+    catch
+    {
+        return Invoke-MenuSelectionOption -Options $Options;
+    }
+}
+
+function Invoke-MenuSelectionOption
+{
+    [CmdletBinding()]
+    param(
+        [string[]]$Options
+    )
+
+    for ($i = 0; $i -lt @($Options).Count; ++$i)
+    {
+        Write-Host "$($i): $($Options[$i])";
+    }
+
+    $good = $false;
+    $sel = -1;
+    while(-not $good)
+    {
+        $inp = Read-Host -Prompt 'Option';
+        try
+        {
+            $sel = [int]::Parse($inp);
+        }
+        catch
+        {
+            $good = $false;
+        }
+
+        if ($sel -ge 0 -and $sel -lt @($Options).Count)
+        {
+            $good = $true;
+        }
+    }
+    return $sel;
+}
+
+function Invoke-MenuSelectionCurses
+{
+    [CmdletBinding()]
+    param(
+        [string[]]$Options
+    )
+
     $fgColor = [System.Console]::ForegroundColor;
     $bgColor = [System.Console]::BackgroundColor;
     $fgColorSel = $bgColor;
@@ -856,7 +914,7 @@ function Get-Scratch {
         return;
     }
     $sel = Invoke-MenuSelection $scratch;
-    if ($sel)
+    if ($sel -ne $null)
     {
         Set-Clipboard $scratch[$sel];
     }
@@ -866,4 +924,202 @@ function Clear-Scratch {
     {
         Remove-Item $Script:ScratchPath;
     }
+}
+
+Set-Alias ns New-Scratch;
+Set-Alias gs Get-Scratch;
+Set-Alias cs Clear-Scratch;
+
+function Group-ObjectTree {
+    param(
+        [Parameter(Position=2,
+                   Mandatory=$true,
+                   ValueFromPipeline=$true)]
+        [Object]
+        $Object,
+        [Parameter(Position=0,
+                   Mandatory=$true)]
+        [String]
+        $Identifier,
+
+        [Parameter(Position=1,
+                   Mandatory=$true)]
+        [String]
+        $ParentKey
+    )
+    begin {
+        $objects = @();
+        $tr = @();
+    }
+    process {
+        $objects += $Object;
+    }
+    end {
+        $objHash = @{};
+        foreach ($o in $objects)
+        {
+            $objHash[$o.$Identifier] = @{
+                'Identifier' = $o.$Identifier;
+                'Object' = $o;
+                'Children' = @();
+            };
+        }
+
+        foreach ($o in $objects)
+        {
+            $key = $o.$ParentKey;
+            if ($key -and $objHash.ContainsKey($key))
+            {
+                $parent = $objHash[$key];
+                $parent.Children += ,($objHash[$o.$Identifier]);
+            }
+            else
+            {
+                $tr += ,($objHash[$o.$Identifier]);
+            }
+        }
+        return $tr;
+    }
+}
+
+function Out-Tree {
+    param(
+ 		[Parameter(Position=4,Mandatory=$true, ValueFromPipeline=$true)]
+        $Tree,
+ 		[Parameter(Position=0)]
+        [Object]$Identifier = '',
+ 		[Parameter(Position=1)]
+        $Spacing = 4,
+ 		[Parameter(Position=2)]
+        $Depth = 0,
+ 		[Parameter(Position=3)]
+        $LastArr = @()
+    )
+    begin {
+        $objects = @();
+    }
+    process {
+        $objects += $Tree
+    }
+    end {
+        for ($j = 0; $j -lt $objects.Count; ++$j)
+        {
+            $t = $objects[$j];
+            $isLast = $j -eq ($objects.Count - 1);
+
+            for ($i = 0; $i -lt $Depth - 1; ++$i)
+            {
+                if ($LastArr[$i + 1])
+                {
+                    Write-HostOutput (' ' * $Spacing) -NoNewLine;
+                }
+                else
+                {
+                    Write-HostOutput '|' -NoNewLine;
+                    Write-HostOutput (' ' * ($Spacing - 1)) -NoNewLine;
+                }
+            }
+            if ($Depth -gt 0)
+            {
+                Write-HostOutput '|' -NoNewLine;
+                Write-HostOutput ('-' * ($Spacing - 1)) -NoNewLine;
+            }
+
+            if ($Identifier.GetType().Name -eq 'ScriptBlock')
+            {
+                $toPrint = $t.Object | % $Identifier;
+                Write-HostOutput $toPrint;
+            }
+            elseif ($Identifier.GetType().Name -eq 'String' -and $Identifier)
+            {
+                Write-HostOutput $t.Object.$Identifier;
+            }
+            else
+            {
+                Write-HostOutput $t.Identifier;
+            }
+
+            $t.Children | Out-Tree -Identifier $Identifier -Depth ($Depth + 1) -Spacing $Spacing -LastArr ($LastArr + $isLast);
+        }
+    }
+}
+
+function ConvertFrom-TableString {
+    param(
+        [Parameter(Mandatory=$false, ValueFromPipeline=$true)]
+        [String]$String
+    )
+    begin
+    {
+        $Table = '';
+    }
+    process
+    {
+        if ($Table)
+        {
+            $Table = "$Table`n$String";
+        }
+        else
+        {
+            $Table = $String;
+        }
+    }
+    end
+    {
+        #
+        # Table headers will be on the first row.
+        #
+
+        $lines = $Table -split '\n'
+        $headerLine = $lines[0];
+        $headers = ($headerLine -split '\s+') | ? {$_};
+
+        if (@($headers | Select -Unique).Count -ne $headers.Count)
+        {
+            Write-Error 'Headers [$($headers -join ',')] are not unique';
+            return;
+        }
+
+        $headerIndex = @();
+        for ($j = 0; $j -lt $headers.Count; ++$j)
+        {
+            $h = $headers[$j];
+            $index = $headerLine.IndexOf($h + ' ');
+            if ($index -eq -1)
+            {
+                $index = $headerLine.IndexOf(' ' + $h) + 1;
+            }
+            $headerIndex += ,$index;
+        }
+
+        #
+        # Extract objects from indices based off headers.
+        #
+
+        for ($i = 1; $i -lt $lines.Count; ++$i)
+        {
+            $obj = [ordered]@{};
+            $line = $lines[$i];
+            if (-not $line.trim())
+            {
+                continue;
+            }
+
+            for ($j = 0; $j -lt $headers.Count; ++$j)
+            {
+                $startIndex = $headerIndex[$j];
+                if ($j -eq $headers.Count - 1)
+                {
+                    $endIndex = $line.Length;
+                }
+                else
+                {
+                    $endIndex = $headerIndex[$j + 1];
+                }
+                $obj[$headers[$j]] = $line.SubString($startIndex, $endIndex - $startIndex ).trim();
+            }
+
+            Write-Output (New-Object PSObject -Property $obj);
+        }
+    };
 }
