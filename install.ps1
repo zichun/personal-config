@@ -27,7 +27,7 @@ gci *.ps1 | % { New-Item -ItemType SymbolicLink -Path "$($env:USERPROFILE)\Docum
 
 # ripgrep config
 cd "$($env:USERPROFILE)\personal-config\ripgrep";
-New-Item -ItemType SymbolicLink -Path "$($env:USERPROFILE)" -Name '.ripgrep' -Target "$($pwd.path)\.ripgrep";
+New-Item -ItemType SymbolicLink -Path "$($env:USERPROFILE)" -Name '.ripgreprc' -Target "$($pwd.path)\.ripgreprc";
 
 # cmder config
 cd "$($env:USERPROFILE)\personal-config\cmder";
