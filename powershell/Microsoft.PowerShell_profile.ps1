@@ -14,28 +14,11 @@ if ($host.Name -eq 'ConsoleHost')
     # Out-default wrapper.
     Import-Module ~\Documents\WindowsPowershell\Out-DefaultWrapper.ps1;
 
-    # CoreXTAutomation
-    Import-Module ~\Documents\WindowsPowershell\CoreXT.ps1;
-
     # Common Functions
     Import-Module ~\Documents\WindowsPowershell\Functions.ps1;
 
     # Posh-git
     Import-Module posh-git;
-
-    # Get-CorpContent
-#    Import-Module "E:\tools\scripts\STSAuthorizationModule\CorpContent.psm1";
-
-    # FDHE
-#    Import-Module ~\Documents\WindowsPowershell\FDHE.ps1;
-
-    # TFS
-#    Import-Module "E:\tools\scripts\tfs\tfs.psm1";
-#    Import-Module "E:\tools\scripts\tfs\tfs-zc.psm1";
-
-    # VSTS WIT
-    $Global:MSAZURE_PAT = 'ctsiqqj2scctkxgnzdur7qu3zoi7bqdy5254ziy5o6wsows2uwfa';
-    Import-Module "E:\tools\scripts\tfs\vsts.psm1";
 }
 
 # Set Up alias
@@ -114,11 +97,33 @@ function Test-IsAdmin {
 
 $Global:IsCurrentUserAdministrator = Test-IsAdmin
 
-function Get-NboxDebugPassword { 'BqAM6BYNqUebDVdTXJ5w'; }
-function Get-NboxAdminPassword { '7nqtgXe42KHx7RwkWeFC'; }
-
 # Chocolatey profile
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {
-  Import-Module "$ChocolateyProfile"
+    Import-Module "$ChocolateyProfile";
+}
+
+function emacs {
+    param($p1, $p2, $p3, $p4)
+    if ($p1)
+    {
+        emacsclientw.exe -n --no-wait --alternate-editor="runemacs.exe" $p1 $p2 $p3 $p4;
+        return;
+    }
+
+    $emacs = Get-Process | Where-Object {$_.Name -like "emacs"};
+    if ($emacs)
+    {
+        [void] [System.Reflection.Assembly]::LoadWithPartialName("'Microsoft.VisualBasic");
+        [Microsoft.VisualBasic.Interaction]::AppActivate($emacs.Id);
+    }
+    else
+    {
+        emacsclientw.exe -n --no-wait --alternate-editor="runemacs.exe" -e '';
+    }
+}
+
+if (Test-Path '.\custom.ps1')
+{
+    . '.\custom.ps1';
 }
