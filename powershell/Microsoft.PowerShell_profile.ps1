@@ -123,10 +123,10 @@ function emacs {
     }
 }
 
-if (Test-Path '.\custom.ps1')
+if (Test-Path "$($env:USERPROFILE)\Documents\WindowsPowerShell\custom.ps1")
 {
     if ($host.Name -eq 'ConsoleHost')
     {
-        . '.\custom.ps1';
+        . "$($env:USERPROFILE)\Documents\WindowsPowerShell\custom.ps1";
     }
 }
