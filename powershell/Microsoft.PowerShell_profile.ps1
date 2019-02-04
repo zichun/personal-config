@@ -125,5 +125,8 @@ function emacs {
 
 if (Test-Path '.\custom.ps1')
 {
-    . '.\custom.ps1';
+    if ($host.Name -eq 'ConsoleHost')
+    {
+        . '.\custom.ps1';
+    }
 }
