@@ -32,38 +32,36 @@ Set-Alias glc Get-LastCommand;
 
 # Set-up Prompt
 
-function prompt {
+function global:prompt {
 
     $realLastExitCode = $LastExitCode
 
     if (Get-Module Posh-Git) {
 
-        #        $Host.UI.RawUI.ForegroundColor = $GitPromptSettings.DefaultForegroundColor;
         Write-Host $pwd.ProviderPath -NoNewLine;
         Write-VcsStatus;
         Write-Host;
-        #        Enable-GitColors
 
     } else {
 
-        $Host.UI.RawUI.ForegroundColor = 'Cyan'
-        Write-Host $pwd.ProviderPath;
+        $Host.UI.RawUI.ForegroundColor = 'Cyan';
+        Write-Host $pwd.ProviderPath;;
 
     }
 
     if ($global:IsCurrentUserAdministrator) {
 
-        $Host.UI.RawUI.ForegroundColor = 'Red'
-        Write-Host '***Administrator*** $' -NoNewLine
+        $Host.UI.RawUI.ForegroundColor = 'Red';
+        Write-Host '***Administrator*** $' -NoNewLine;
 
     } else {
 
-        $Host.UI.RawUI.ForegroundColor = 'Yellow'
-        Write-Host '>' -NoNewline
+        $Host.UI.RawUI.ForegroundColor = 'Yellow';
+        Write-Host '>' -NoNewline;
 
     }
 
-    $Global:LastExitCode = $realLastExitCode
+    $Global:LastExitCode = $realLastExitCode;
 
     $out = ' ';
 
@@ -73,7 +71,7 @@ function prompt {
         # command properly with "Shift+Home", to change cursor
         # position in the prompt by simple mouse click, etc.
 
-        $out += "$([char]27)]9;12$([char]7)"
+        $out += "$([char]27)]9;12$([char]7)";
 
         # And current working directory (FileSystem)
         # ConEmu may show full path or just current folder name
@@ -82,8 +80,9 @@ function prompt {
         # on files in the output from compilers and source control
         # systems (git, hg, ...)
         if ($pwd.Provider.Name -eq "FileSystem") {
-            $out += "$([char]27)]9;9;`"$($pwd.Path)`"$([char]7)"
+            $out += "$([char]27)]9;9;`"$($pwd.Path)`"$([char]7)";
         }
+        return $out;
     }
 
     return $out;
