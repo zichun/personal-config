@@ -39,3 +39,13 @@ New-Item -ItemType SymbolicLink -Path "$($env:USERPROFILE)" -Name '.ripgreprc' -
 # cmder config
 cd "$($env:USERPROFILE)\personal-config\cmder";
 New-Item -ItemType SymbolicLink -Path \tools\Cmder\vendor\conemu-maximus5\ -Name 'ConEmu.xml' -Target "$($pwd.path)\ConEmu.xml";
+
+#
+# Setup Powerline
+#
+cd $env:USERPROFILE;
+& "$($env:ProgramFiles)\Git\cmd\git" clone https://github.com/powerline/fonts.git;
+cd fonts;
+.\install.ps1;
+
+Install-Module -Name 'oh-my-posh';
