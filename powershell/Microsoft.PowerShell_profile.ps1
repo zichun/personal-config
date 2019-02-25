@@ -16,9 +16,13 @@ if ($host.Name -eq 'ConsoleHost')
 
     # Common Functions
     Import-Module ~\Documents\WindowsPowershell\Functions.ps1;
+}
 
-    # Posh-git
-    Import-Module posh-git;
+if ($env:ConEmuPID)
+{
+    Import-Module 'oh-my-posh';
+    Set-Theme 'Paradox';
+    $DefaultUser = $env:USERNAME;
 }
 
 # Set Up alias
@@ -32,61 +36,61 @@ Set-Alias glc Get-LastCommand;
 
 # Set-up Prompt
 
-function global:prompt {
+# function global:prompt {
 
-    $realLastExitCode = $LastExitCode
+#     $realLastExitCode = $LastExitCode
 
-    if (Get-Module Posh-Git) {
+#     if (Get-Module Posh-Git) {
 
-        Write-Host $pwd.ProviderPath -NoNewLine;
-        Write-VcsStatus;
-        Write-Host;
+#         Write-Host $pwd.ProviderPath -NoNewLine;
+#         Write-VcsStatus;
+#         Write-Host;
 
-    } else {
+#     } else {
 
-        $Host.UI.RawUI.ForegroundColor = 'Cyan';
-        Write-Host $pwd.ProviderPath;;
+#         $Host.UI.RawUI.ForegroundColor = 'Cyan';
+#         Write-Host $pwd.ProviderPath;;
 
-    }
+#     }
 
-    if ($global:IsCurrentUserAdministrator) {
+#     if ($global:IsCurrentUserAdministrator) {
 
-        $Host.UI.RawUI.ForegroundColor = 'Red';
-        Write-Host '***Administrator*** $' -NoNewLine;
+#         $Host.UI.RawUI.ForegroundColor = 'Red';
+#         Write-Host '***Administrator*** $' -NoNewLine;
 
-    } else {
+#     } else {
 
-        $Host.UI.RawUI.ForegroundColor = 'Yellow';
-        Write-Host '>' -NoNewline;
+#         $Host.UI.RawUI.ForegroundColor = 'Yellow';
+#         Write-Host '>' -NoNewline;
 
-    }
+#     }
 
-    $Global:LastExitCode = $realLastExitCode;
+#     $Global:LastExitCode = $realLastExitCode;
 
-    $out = ' ';
+#     $out = ' ';
 
-    # Check for ConEmu existance and ANSI emulation enabled
-    if ($env:ConEmuANSI -eq "ON") {
-        # Let ConEmu know when the prompt ends, to select typed
-        # command properly with "Shift+Home", to change cursor
-        # position in the prompt by simple mouse click, etc.
+#     # Check for ConEmu existance and ANSI emulation enabled
+#     if ($env:ConEmuANSI -eq "ON") {
+#         # Let ConEmu know when the prompt ends, to select typed
+#         # command properly with "Shift+Home", to change cursor
+#         # position in the prompt by simple mouse click, etc.
 
-        $out += "$([char]27)]9;12$([char]7)";
+#         $out += "$([char]27)]9;12$([char]7)";
 
-        # And current working directory (FileSystem)
-        # ConEmu may show full path or just current folder name
-        # in the Tab label (check Tab templates)
-        # Also this knowledge is crucial to process hyperlinks clicks
-        # on files in the output from compilers and source control
-        # systems (git, hg, ...)
-        if ($pwd.Provider.Name -eq "FileSystem") {
-            $out += "$([char]27)]9;9;`"$($pwd.Path)`"$([char]7)";
-        }
-        return $out;
-    }
+#         # And current working directory (FileSystem)
+#         # ConEmu may show full path or just current folder name
+#         # in the Tab label (check Tab templates)
+#         # Also this knowledge is crucial to process hyperlinks clicks
+#         # on files in the output from compilers and source control
+#         # systems (git, hg, ...)
+#         if ($pwd.Provider.Name -eq "FileSystem") {
+#             $out += "$([char]27)]9;9;`"$($pwd.Path)`"$([char]7)";
+#         }
+#         return $out;
+#     }
 
-    return $out;
-}
+#     return $out;
+# }
 
 function Test-IsAdmin {
     $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent();
