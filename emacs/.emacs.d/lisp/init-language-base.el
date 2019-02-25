@@ -35,6 +35,8 @@
         (awk-mode . "awk")
         (other . "k&r")))
 
+(setq c-basic-offset 4)
+
 ;;
 ;; cc-mode c++-mode customize font locking
 (global-font-lock-mode t)
