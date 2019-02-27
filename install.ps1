@@ -26,11 +26,13 @@ New-Item -Path env:\HOME -Value $env:USERPROFILE;
 # Powershell configs
 cd "$($env:USERPROFILE)\personal-config\powershell";
 gci *.ps1 | % { New-Item -ItemType SymbolicLink -Path "$($env:USERPROFILE)\Documents\WindowsPowerShell" -Name $_.Name -Target $_.FullName };
+gci *.psm1 | % { New-Item -ItemType SymbolicLink -Path "$($env:USERPROFILE)\Documents\WindowsPowerShell" -Name $_.Name -Target $_.FullName };
 
 # pwsh configs
 cd "$($env:USERPROFILE)\personal-config\powershell";
 mkdir "$($env:USERPROFILE)\Documents\Powershell";
 gci *.ps1 | % { New-Item -ItemType SymbolicLink -Path "$($env:USERPROFILE)\Documents\Powershell" -Name $_.Name -Target $_.FullName };
+gci *.psm1 | % { New-Item -ItemType SymbolicLink -Path "$($env:USERPROFILE)\Documents\Powershell" -Name $_.Name -Target $_.FullName };
 
 # ripgrep config
 cd "$($env:USERPROFILE)\personal-config\ripgrep";

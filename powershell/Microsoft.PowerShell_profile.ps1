@@ -21,7 +21,12 @@ if ($host.Name -eq 'ConsoleHost')
 if ($env:ConEmuPID)
 {
     Import-Module 'oh-my-posh';
-    Set-Theme 'Paradox';
+    if (-not (Test-Path "$($ThemeSettings.MyThemesLocation)\Paradox2.psm1"))
+    {
+        mkdir $ThemeSettings.MyThemesLocation -ErrorAction SilentlyContinue;
+        copy "$($PSScriptRoot)\Paradox2.psm1" "$($ThemeSettings.MyThemesLocation)\Paradox2.psm1";
+    }
+    Set-Theme 'Paradox2';
     $DefaultUser = $env:USERNAME;
 }
 
