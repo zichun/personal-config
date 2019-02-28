@@ -12,10 +12,13 @@ if ($host.Name -eq 'ConsoleHost')
 #    Import-Module posh-git;
 
     # Out-default wrapper.
-    Import-Module ~\Documents\WindowsPowershell\Out-DefaultWrapper.ps1;
+    Import-Module "$PSScriptRoot\Out-DefaultWrapper.ps1";
 
     # Common Functions
-    Import-Module ~\Documents\WindowsPowershell\Functions.ps1;
+    Import-Module "$PSScriptRoot\Functions.ps1";
+
+    # Filter Interactive
+    Import-Module "$PSScriptRoot\fi.psm1";
 }
 
 if ($env:ConEmuPID)
@@ -38,6 +41,7 @@ Set-Alias highlight Highlight-String;
 Set-Alias hi Highlight-String;
 Set-Alias glr Get-LastResult;
 Set-Alias glc Get-LastCommand;
+Set-Alias fi Filter-Interactive;
 
 # Set-up Prompt
 

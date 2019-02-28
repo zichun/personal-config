@@ -534,6 +534,7 @@ function Find-String
         }
     }
 }
+
 function Find-File {
     param(
         $Pattern,
@@ -555,6 +556,7 @@ function Find-File {
         };
     }
 }
+
 function op($ind) {
     $res = $Script:FindFileResult;
 
@@ -725,7 +727,6 @@ function Invoke-MenuSelectionCurses
         {
             [System.Console]::CursorTop = $tmp;
         }
-
 
         # Read Key
 		$inputKey = [System.Console]::ReadKey($false);
