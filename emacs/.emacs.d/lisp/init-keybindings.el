@@ -14,7 +14,6 @@
 (global-set-key (kbd "C-x g") 'magit-status)
 (global-set-key (kbd "C-M-[") 'origami-close-node)
 (global-set-key (kbd "C-M-]") 'origami-open-node)
-(global-set-key (kbd "<f5>") #'deadgrep)
 
 ;; movements
 (global-set-key (kbd "C-S-n")
@@ -73,5 +72,7 @@
 ;; Other commands
 (global-set-key (kbd "C-c C-r") 'ivy-resume)
 (global-set-key (kbd "C-x C-i") 'counsel-imenu)
+
+(global-set-key (kbd "C-c f") #'deadgrep)
 
 (provide 'init-keybindings)

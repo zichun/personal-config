@@ -41,7 +41,7 @@ Set-Alias highlight Highlight-String;
 Set-Alias hi Highlight-String;
 Set-Alias glr Get-LastResult;
 Set-Alias glc Get-LastCommand;
-Set-Alias si Select-Interactive;
+Set-Alias sin Select-Interactive;
 
 # Set-up Prompt
 
