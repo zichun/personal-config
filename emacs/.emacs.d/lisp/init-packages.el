@@ -31,6 +31,7 @@
                           flycheck
                           spaceline
                           anzu
+                          deadgrep
 
                           ; modes
                           company

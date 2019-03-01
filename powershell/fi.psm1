@@ -1,4 +1,4 @@
-function Filter-Interactive {
+function Select-Interactive {
     [CmdletBinding()]
     param(
         [Parameter(Position=0,
