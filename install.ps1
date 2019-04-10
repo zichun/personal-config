@@ -22,6 +22,7 @@ cd $env:USERPROFILE;
 cd "$($env:USERPROFILE)\personal-config\emacs";
 New-Item -ItemType Junction -Path "$($env:USERPROFILE)\.emacs.d" -Value "$($pwd.path)\.emacs.d";
 New-Item -Path env:\HOME -Value $env:USERPROFILE;
+ [System.Environment]::SetEnvironmentVariable('HOME', $env:USERPROFILE, [System.EnvironmentVariableTarget]::Machine)
 
 # Powershell configs
 cd "$($env:USERPROFILE)\personal-config\powershell";

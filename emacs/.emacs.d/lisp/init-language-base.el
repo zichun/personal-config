@@ -1,4 +1,6 @@
 ;(add-hook 'after-init-hook 'global-company-mode)
+
+(require 'powershell)
 (autoload 'powershell-mode "powershell-mode" "A editing mode for Microsoft PowerShell." t)
 
 
