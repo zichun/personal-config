@@ -79,7 +79,10 @@ function Highlight-String {
 }
 
 function Show-Notification {
-    param($type, $text, $title, $notificationTimeout = 10)
+    param($title,
+          $text,
+          $type = 'Info',
+          $notificationTimeout = 10)
 
     # load Windows Forms and drawing assemblies
     [reflection.assembly]::loadwithpartialname("System.Windows.Forms") | Out-Null
@@ -1123,4 +1126,33 @@ function ConvertFrom-TableString {
             Write-Output (New-Object PSObject -Property $obj);
         }
     };
+}
+
+function Then {
+    param(
+        [Parameter(Position=1, Mandatory=$true, ValueFromPipeline=$true)]
+        [ScriptBlock]$Trigger,
+
+        [Parameter(Position=0, Mandatory=$false)]
+        [ScriptBlock]$Action
+    )
+
+    while ($true)
+    {
+        $res = & $Trigger;
+        if ($res)
+        {
+            break;
+        }
+        Start-Sleep 5;
+    }
+
+    if (-not $Action)
+    {
+        Show-Notification -Type 'Info' -Text $Trigger.ToString() -Title 'Task Completed';
+    }
+    else
+    {
+        $res | % $Action;
+    }
 }
