@@ -46,6 +46,7 @@
                           origami
 
                           ; language modes
+                          lsp-mode
                           csharp-mode
                           fsharp-mode
                           markdown-mode
