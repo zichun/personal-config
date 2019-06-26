@@ -73,12 +73,12 @@
 ;; (require 'cquery)
 ;; (setq cquery-executable "C:/tools/release/bin/cquery.exe")
 
-(use-package lsp-pwsh
-  :straight (lsp-pwsh
-             :host github
-             :repo "kiennq/lsp-powershell"
-             :files (:defaults "bin"))
-  :hook (powershell-mode . (lambda () (require 'lsp-pwsh) (lsp)))
-  :defer t)
+;; (use-package lsp-pwsh
+;;   :straight (lsp-pwsh
+;;              :host github
+;;              :repo "kiennq/lsp-powershell"
+;;              :files (:defaults "bin"))
+;;   :hook (powershell-mode . (lambda () (require 'lsp-pwsh) (lsp)))
+;;   :defer t)
 
 (provide 'init-language-base)

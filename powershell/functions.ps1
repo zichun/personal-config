@@ -829,7 +829,17 @@ function Get-CachedDirectories
 
 function New-CachedDirectory
 {
-    $path = ((pwd).Path);
+    param($NewPath)
+
+    if ($NewPath)
+    {
+        $path = $NewPath;
+    }
+    else
+    {
+        $path = ((pwd).Path);
+    }
+
     if (-not ($Script:CachedDirectories -contains $path))
     {
         $Script:CachedDirectories += ,$path;
@@ -1149,10 +1159,10 @@ function Then {
 
     if (-not $Action)
     {
-        Show-Notification -Type 'Info' -Text $Trigger.ToString() -Title 'Task Completed';
+        Show-Notification -Type 'Info' -Text $res -Title 'Task Completed';
     }
     else
     {
-        $res | % $Action;
+        $res | . $Action;
     }
 }
