@@ -249,4 +249,16 @@ Symbols matching the text at point are put first in the completion list."
       (yank)
       (insert ?\n))))
 
+;; Enable Hide Show minor mode globally
+(add-hook 'prog-mode-hook 'hs-minor-mode)
+;; Custom HideShow Function
+(defun toggle-fold ()
+  (interactive)
+  (save-excursion
+    (end-of-line)
+    (hs-toggle-hiding)))
+
+(global-set-key [C-tab] 'toggle-fold)
+(global-set-key (kbd "C-.") 'hs-show-all)
+
 (provide 'init-utils)
