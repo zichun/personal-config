@@ -1,10 +1,3 @@
-function Remove-FCShellCrap {
-    $regex = '\b[A-F0-9]{8}(?:-[A-F0-9]{4}){3}-[A-F0-9]{12}\b';
-    get-item * | ? {$_ -match $regex } | remove-item -recurse;
-
-    write-host "Remember to delete the zip files";
-}
-
 function car($arr) {
     $first, $null = $arr;
     return $first;
