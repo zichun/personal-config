@@ -14,6 +14,7 @@ choco install poshgit -y;
 
 Install-Module -Name PowerShellGet -Force;
 Install-Module posh-git -Scope CurrentUser -Force;
+Install-Module ClipboardText -Scope CurrentUser -Force;
 
 cd $env:USERPROFILE;
 & "$($env:ProgramFiles)\Git\cmd\git" clone https://github.com/zichun/personal-config.git;

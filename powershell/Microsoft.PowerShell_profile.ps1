@@ -126,8 +126,24 @@ function emacs {
     $emacs = Get-Process | Where-Object {$_.Name -like "emacs"};
     if ($emacs)
     {
-        [void] [System.Reflection.Assembly]::LoadWithPartialName("'Microsoft.VisualBasic");
-        [Microsoft.VisualBasic.Interaction]::AppActivate($emacs.Id);
+Add-Type @"
+    using System;
+    using System.Runtime.InteropServices;
+    public class WinAp {
+      [DllImport("user32.dll")]
+      [return: MarshalAs(UnmanagedType.Bool)]
+      public static extern bool SetForegroundWindow(IntPtr hWnd);
+
+      [DllImport("user32.dll")]
+      [return: MarshalAs(UnmanagedType.Bool)]
+      public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+    }
+"@
+        $h = $emacs.MainWindowHandle;
+        [void] [WinAp]::SetForegroundWindow($h);
+
+#        [void] [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.VisualBasic");
+#        [Microsoft.VisualBasic.Interaction]::AppActivate($emacs.Id);
     }
     else
     {
@@ -140,5 +156,31 @@ if (Test-Path "$($env:USERPROFILE)\Documents\WindowsPowerShell\custom.ps1")
     if ($host.Name -eq 'ConsoleHost')
     {
         . "$($env:USERPROFILE)\Documents\WindowsPowerShell\custom.ps1";
+    }
+}
+
+
+# PSCore hacks
+if ($PSVersionTable.PSVersion.Major -eq 6)
+{
+    Import-Module ClipboardText;
+
+    function Set-Clipboard {
+        [CmdletBinding()]
+        param(
+            [Parameter(Position=0,
+                       Mandatory=$true,
+                       ValueFromPipeline=$true,
+                       ValueFromPipelineByPropertyName=$true)]
+            [Object]
+            $Value
+        )
+
+        $Value | Set-ClipboardText;
+    }
+
+    function Get-Clipboard
+    {
+        Get-ClipboardText;
     }
 }

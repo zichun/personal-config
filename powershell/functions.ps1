@@ -893,7 +893,7 @@ Set-Alias ad New-CachedDirectory;
 Set-Alias dd Remove-CachedDirectory;
 Set-Alias gd Set-CachedDirectory;
 
-$Script:ScratchPath = 'E:\logs\scratch.txt';
+$Script:ScratchPath = 'Z:\scratch.txt';
 function New-Scratch {
     [CmdletBinding()]
     Param(
