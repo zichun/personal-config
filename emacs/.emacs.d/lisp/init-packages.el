@@ -29,7 +29,6 @@
                           shell-pop
                           golden-ratio
                           flycheck
-                          spaceline
                           anzu
                           deadgrep
 
@@ -56,6 +55,12 @@
                           tide
                           rust-mode
                           flycheck-rust
+
+                          ; UI
+                          spaceline
+                          doom-modeline
+                          doom-themes
+                          solaire-mode
 
                           ; themes
                           molokai-theme

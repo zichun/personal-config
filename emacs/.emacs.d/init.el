@@ -16,6 +16,7 @@
 
 (require 'init-keybindings)
 
+(setq backup-directory-alist '(("." . "~/MyEmacsBackups")))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

@@ -50,6 +50,8 @@
 (setq org-list-description-max-indent 5)
 ;; prevent demoting heading also shifting text inside sections
 (setq org-adapt-indentation nil)
+;; Hide emphasis char
+(setq org-hide-emphasis-markers t)
 
 (add-to-list 'org-emphasis-alist
              '("*" (:foreground "#FD971F" :height 145 :box t :weight semi-bold)))
