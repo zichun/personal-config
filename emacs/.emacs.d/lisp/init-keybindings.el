@@ -75,4 +75,10 @@
 
 (global-set-key (kbd "C-c f") #'deadgrep)
 
+;; Swiper
+(global-set-key (kbd "C-s") 'swiper)
+(global-set-key (kbd "C-r") 'swiper-backward)
+(define-key ivy-minibuffer-map (kbd "C-r") 'ivy-previous-line-or-history)
+
+
 (provide 'init-keybindings)

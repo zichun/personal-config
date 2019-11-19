@@ -32,9 +32,9 @@
 ;;
 
 (load-theme 'monokai t)
-(set-face-attribute 'default nil :height 135)
+(set-face-attribute 'default nil :height 130)
 (when window-system
-  (set-face-attribute 'default nil :font "Consolas")
+  (set-face-attribute 'default nil :font "Noto Sans Mono")
   (setq-default line-spacing 3))
 
 ;;
@@ -53,6 +53,7 @@
 ;; (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
 
 (ivy-mode 1)
+(setq ivy-dynamic-exhibit-delay-ms 250)
 (setq ivy-use-virtual-buffers t)
 (setq ivy-count-format "(%d/%d) ")
 (setq ivy-re-builders-alist
