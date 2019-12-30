@@ -565,7 +565,7 @@ function op($ind) {
         {
             write-host $res[$ind];
             Write-Host "Opening $($matches[1]):$($matches[2])";
-            & "C:\users\kohzi\tools\emacs\bin\emacsclientw.exe" '-n' '--no-wait' '--alternate-editor=`"C:\users\kohzi\tools\emacs\bin\runemacs.exe`"' "+$($matches[2]):0" $matches[1];
+            & "C:\ProgramData\chocolatey\lib\Emacs\tools\emacs\bin\emacsclientw.exe" '-n' '--no-wait' '--alternate-editor=`"C:\ProgramData\chocolatey\lib\Emacs\tools\emacs\bin\runemacs.exe`"' "+$($matches[2]):0" $matches[1];
         }
     } catch {
     }
@@ -573,7 +573,7 @@ function op($ind) {
 
 function Get-OrgImageLink {
     add-type -an system.windows.forms;
-    $Script:OrgDirectory = 'C:\Users\kohzi\OneDrive\org';
+    $Script:OrgDirectory = "$($env:USERPROFILE)\OneDrive\org";
 
     $imageDir = "$($Script:OrgDirectory)\images";
     $image = [System.Windows.Forms.Clipboard]::GetImage();
@@ -1157,5 +1157,24 @@ function Then {
     else
     {
         $res | . $Action;
+    }
+}
+
+function Invoke-Environment
+{
+    param
+    (
+        [Parameter(Mandatory=$true)] [string]
+        $Command
+    )
+
+    cmd /c "$Command > nul 2>&1 && set" | .{process{
+                                                if ($_ -match '^([^=]+)=(.*)') {
+                                                    [System.Environment]::SetEnvironmentVariable($matches[1], $matches[2])
+                                                }
+                                            }}
+
+    if ($LASTEXITCODE) {
+        throw "Command '$Command': exit code: $LASTEXITCODE"
     }
 }
