@@ -42,7 +42,6 @@
                           ido-vertical-mode
                           powershell
                           magit
-                          origami
 
                           ; language modes
                           lsp-mode
@@ -61,6 +60,8 @@
                           doom-modeline
                           doom-themes
                           solaire-mode
+                          ivy-posframe
+                          ivy-rich
 
                           ; themes
                           molokai-theme
