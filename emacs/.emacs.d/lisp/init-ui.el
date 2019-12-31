@@ -31,7 +31,7 @@
 ;; Theme
 ;;
 
-(load-theme 'monokai t)
+;(load-theme 'monokai t)
 (set-face-attribute 'default nil :height 130)
 (when window-system
   (set-face-attribute 'default nil :font "Noto Sans Mono")
@@ -163,7 +163,7 @@
 
 ;; Load the theme (doom-one, doom-molokai, etc); keep in mind that each theme
 ;; may have their own settings.
-(load-theme 'doom-molokai t)
+(load-theme 'doom-snazzy t)
 
 (require 'solaire-mode)
 
@@ -207,7 +207,7 @@
           (t . ivy-posframe-display-at-frame-top-center))
         ivy-posframe-height-alist '((t . 20)))
   (setq ivy-posframe-parameters '((internal-border-width . 10) (font . "Consolas")))
-  (setq ivy-posframe-width 70)
+  (setq ivy-posframe-width 700)
   (ivy-posframe-mode +1))
 
 (use-package ivy-rich
@@ -221,7 +221,7 @@
         '(ivy-switch-buffer
           (:columns
            ((ivy-rich-switch-buffer-icon (:width 2))
-            (ivy-rich-candidate (:width 35))
+            (ivy-rich-candidate (:width 40))
             (ivy-rich-switch-buffer-project (:width 15 :face success))
             (ivy-rich-switch-buffer-major-mode (:width 13 :face warning)))
            :predicate
@@ -229,18 +229,18 @@
 
           counsel-M-x
           (:columns
-           ((counsel-M-x-transformer (:width 35))  ; thr original transformer
-            (ivy-rich-counsel-function-docstring (:width 34 :face font-lock-doc-face))))
+           ((counsel-M-x-transformer (:width 40))  ; thr original transformer
+            (ivy-rich-counsel-function-docstring (:width 100 :face font-lock-doc-face))))
 
           counsel-describe-function
           (:columns
-           ((counsel-describe-function-transformer (:width 35))
-            (ivy-rich-counsel-function-docstring (:width 34 :face font-lock-doc-face))))
+           ((counsel-describe-function-transformer (:width 40))
+            (ivy-rich-counsel-function-docstring (:width 100 :face font-lock-doc-face))))
 
           counsel-describe-variable
           (:columns
-           ((counsel-describe-variable-transformer (:width 35))
-            (ivy-rich-counsel-variable-docstring (:width 34 :face font-lock-doc-face))))
+           ((counsel-describe-variable-transformer (:width 40))
+            (ivy-rich-counsel-variable-docstring (:width 100 :face font-lock-doc-face))))
 
           package-install
           (:columns
