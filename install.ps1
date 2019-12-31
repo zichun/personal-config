@@ -54,3 +54,12 @@ cd fonts;
 .\install.ps1;
 
 Install-Module -Name 'oh-my-posh';
+
+#
+# rust
+#
+# choco install rustup;
+#
+# rustup update
+# rustup component add clippy --toolchain stable-x86_64-pc-windows-msvc
+# rustup component add rls rust-analysis rust-src;
