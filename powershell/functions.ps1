@@ -565,7 +565,7 @@ function op($ind) {
         {
             write-host $res[$ind];
             Write-Host "Opening $($matches[1]):$($matches[2])";
-            & "C:\ProgramData\chocolatey\lib\Emacs\tools\emacs\bin\emacsclientw.exe" '-n' '--no-wait' '--alternate-editor=`"C:\ProgramData\chocolatey\lib\Emacs\tools\emacs\bin\runemacs.exe`"' "+$($matches[2]):0" $matches[1];
+            & "$($env:PROGRAMDATA)\chocolatey\lib\Emacs\tools\emacs\bin\emacsclientw.exe" '-n' '--no-wait' '--alternate-editor=`"C:\ProgramData\chocolatey\lib\Emacs\tools\emacs\bin\runemacs.exe`"' "+$($matches[2]):0" $matches[1];
         }
     } catch {
     }
