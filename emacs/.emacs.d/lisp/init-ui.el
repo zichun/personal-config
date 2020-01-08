@@ -215,10 +215,22 @@
   (defun ivy-rich-switch-buffer-icon (candidate)
     (with-current-buffer
         (get-buffer candidate)
-      (all-the-icons-icon-for-mode major-mode)))
+      (let ((icon (all-the-icons-icon-for-mode major-mode)))
+        (if (symbolp icon)
+            (all-the-icons-icon-for-mode 'fundamental-mode)
+          icon))))
   :init
   (setq ivy-rich-display-transformers-list ; max column width sum = (ivy-poframe-width - 1)
         '(ivy-switch-buffer
+          (:columns
+           ((ivy-rich-switch-buffer-icon (:width 2))
+            (ivy-rich-candidate (:width 40))
+            (ivy-rich-switch-buffer-project (:width 15 :face success))
+            (ivy-rich-switch-buffer-major-mode (:width 13 :face warning)))
+           :predicate
+           (lambda (cand) (get-buffer cand)))
+
+          ivy-switch-buffer-other-window
           (:columns
            ((ivy-rich-switch-buffer-icon (:width 2))
             (ivy-rich-candidate (:width 40))
