@@ -163,7 +163,7 @@
 
 ;; Load the theme (doom-one, doom-molokai, etc); keep in mind that each theme
 ;; may have their own settings.
-(load-theme 'doom-palenight t)
+(load-theme 'doom-molokai t)
 (doom-themes-org-config)
 
 (require 'solaire-mode)
