@@ -62,6 +62,7 @@
                           solaire-mode
                           ivy-posframe
                           ivy-rich
+                          org-bullets
 
                           ; themes
                           molokai-theme

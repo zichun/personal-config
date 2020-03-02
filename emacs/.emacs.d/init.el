@@ -83,6 +83,7 @@
  '(js3-visitor-offset t t)
  '(linum-format " %7i ")
  '(magit-diff-use-overlays nil)
+ '(markdown-command "pandoc")
  '(org-agenda-files (quote ("~/OneDrive/org/journal.org")))
  '(package-selected-packages
    (quote

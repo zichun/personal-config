@@ -54,12 +54,29 @@
 (setq org-hide-emphasis-markers t)
 
 (add-to-list 'org-emphasis-alist
-             '("*" (:foreground "#FD971F" :height 145 :box t :weight semi-bold)))
+             '("*" (:inherit font-lock-variable-name-face :height 1.45 :weight semi-bold :underline t :overline t)))
 
 (add-to-list 'org-emphasis-alist
-             '("/" (:foreground "#AE81FF" :height 145)))
+             '("/" (:inherit font-lock-type-face :slant italic :height 145)))
 
 (add-to-list 'org-emphasis-alist
-             '("_" (:foreground "#A6E22E" :height 145 :underline t)))
+             '("_" (:inherit font-lock-function-name-face :height 145 :underline t)))
+
+(add-to-list 'org-emphasis-alist
+             '("~" (:inherit font-lock-string-face)))
+
+(use-package org-bullets
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
+(custom-theme-set-faces
+ 'user
+ `(org-level-4 ((t :inherit outline-5 :height 1.3)))
+ `(org-level-4 ((t :inherit outline-4 :height 1.5)))
+ `(org-level-3 ((t :inherit outline-3 :font "Cambria" :height 1.3)))
+ `(org-level-2 ((t :inherit outline-2 :font "Cambria" :height 1.25)))
+ `(org-level-1 ((t :inherit outline-1 :font "Cambria" :height 1.25)))
+ `(org-block-begin-line ((nil :font "Consolas" :height 0.8 :slant italic)))
+ `(org-block ((t :background "#000"))))
 
 (provide 'init-org)
