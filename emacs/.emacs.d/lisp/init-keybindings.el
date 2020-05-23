@@ -76,6 +76,7 @@
 ;; Swiper
 (global-set-key (kbd "C-s") 'swiper)
 (global-set-key (kbd "C-r") 'swiper-backward)
+(define-key ivy-minibuffer-map (kbd "C-s") 'ivy-next-line-or-history)
 (define-key ivy-minibuffer-map (kbd "C-r") 'ivy-previous-line-or-history)
 
 

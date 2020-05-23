@@ -115,6 +115,11 @@ if (Test-Path($ChocolateyProfile)) {
     Import-Module "$ChocolateyProfile";
 }
 
+function e {
+    param($p1, $p2, $p3, $p4)
+    emacs.exe -nw $p1 $p2 $p3 $p4;
+}
+
 function emacs {
     param($p1, $p2, $p3, $p4)
     if ($p1)
@@ -159,6 +164,7 @@ if (Test-Path "$($env:USERPROFILE)\Documents\WindowsPowerShell\custom.ps1")
     }
 }
 
+Set-PSReadLineKeyHandler -Chord Shift+Spacebar -Function SelfInsert
 
 # PSCore hacks
 if ($PSVersionTable.PSVersion.Major -eq 6)

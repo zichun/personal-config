@@ -35,6 +35,12 @@
       auto-save-interval 200            ; number of keystrokes between auto-saves (default: 300)
       )
 
+; do not check if remote files are readable
+(setq recentf-keep '(file-remote-p file-readable-p))
+(setq recentf-exclude (quote ("Z:\\'")))
+
+;
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
