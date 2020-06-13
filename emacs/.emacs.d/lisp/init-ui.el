@@ -202,11 +202,14 @@
   :after ivy
   :diminish
   :config
+  (set-face-attribute 'ivy-posframe nil :background "gray11")
+  (set-face-attribute 'ivy-posframe-border nil :background "gray11")
   (setq ivy-posframe-display-functions-alist
-        '((swiper          . nil)
+        '((swiper          . ivy-display-function-fallback)
           (complete-symbol . ivy-posframe-display-at-point)
           (t . ivy-posframe-display-at-frame-top-center))
         ivy-posframe-height-alist '((t . 20)))
+  (setq ivy-posframe-border-width 10)
   (setq ivy-posframe-parameters '((internal-border-width . 10) (font . "Consolas")))
   (setq ivy-posframe-width 700)
   (ivy-posframe-mode +1))

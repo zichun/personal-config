@@ -56,7 +56,7 @@
 (setq org-hide-emphasis-markers t)
 
 (add-to-list 'org-emphasis-alist
-             '("*" (:inherit font-lock-variable-name-face :height 1.45 :weight semi-bold :underline t :overline t)))
+             '("*" (:inherit font-lock-warning-face :height 1.8 :weight bold :underline f)))
 
 (add-to-list 'org-emphasis-alist
              '("/" (:inherit font-lock-type-face :slant italic :height 145)))
@@ -80,5 +80,45 @@
  `(org-level-1 ((t :inherit outline-1 :font "Cambria" :height 1.25)))
  `(org-block-begin-line ((nil :font "Consolas" :height 0.8 :slant italic)))
  `(org-block ((t :background "#000"))))
+
+
+(require 'ob)
+(require 'ob-eval)
+
+(defvar org-babel-default-header-args:mermaid
+  '((:results . "file") (:exports . "results"))
+  "Default arguments for evaluatiing a mermaid source block.")
+
+(defun org-babel-execute:mermaid (body params)
+  (let* ((out-file
+          (or (expand-file-name (concat "~/OneDrive/org/"
+                                        (cdr (assoc :file params))))
+              (error "mermaid requires a \":file\" header argument")))
+	 (theme (cdr (assoc :theme params)))
+	 (width (cdr (assoc :width params)))
+	 (height (cdr (assoc :height params)))
+	 (background-color (cdr (assoc :background-color params)))
+     (temp-file (org-babel-temp-file "mermaid-"))
+     (cmd (concat "pwsh"
+                  " -NonInteractive -NoProfile C:/Users/kzc16/AppData/Roaming/npm/mmdc.ps1 "
+                  " -i " temp-file
+                  " -o " out-file
+                  (when theme
+                    (concat " -t " theme))
+                  (when background-color
+                    (concat " -b " background-color))
+                  (when width
+                    (concat " -w " width))
+                  (when height
+                    (concat " -H " height)))))
+    (with-temp-file temp-file (insert body))
+    (message "%s" cmd)
+    (message "%s" out-file)
+    (org-babel-eval cmd "")
+    nil))
+
+;; (org-babel-do-load-languages
+;;       'org-babel-load-languages
+;;       '((mermaid . t)))
 
 (provide 'init-org)
