@@ -598,9 +598,13 @@ function Invoke-MenuSelection
 {
     [CmdletBinding()]
     param(
+        $Title,
         [string[]]$Options
     )
-
+    if ($Title)
+    {
+        Write-Host $Title;
+    }
     try
     {
         return Invoke-MenuSelectionCurses -Options $Options;
@@ -903,7 +907,7 @@ function New-Scratch {
     if (Test-Path $Script:ScratchPath)
     {
         $scratch = (gc $Script:ScratchPath) | ConvertFrom-JSON;
-        $scratch += ,$data;
+        $scratch = @($scratch) + ,$data;
         $scratch | ConvertTo-JSON | Out-File $Script:ScratchPath;
     }
     else
@@ -920,7 +924,7 @@ function Get-Scratch {
     {
         return;
     }
-    $sel = Invoke-MenuSelection $scratch;
+    $sel = Invoke-MenuSelection -Options $scratch;
     if ($sel -ne $null)
     {
         Set-Clipboard $scratch[$sel];
