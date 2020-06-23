@@ -850,7 +850,7 @@ function Set-CachedDirectory
 
     if (-not $Index -and ($Index -ne '0'))
     {
-        $Index = Invoke-MenuSelection $Script:CachedDirectories;
+        $Index = Invoke-MenuSelection -Options $Script:CachedDirectories;
     }
 
     $Index = [int]::parse($Index);

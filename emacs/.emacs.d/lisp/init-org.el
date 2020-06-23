@@ -56,7 +56,7 @@
 (setq org-hide-emphasis-markers t)
 
 (add-to-list 'org-emphasis-alist
-             '("*" (:inherit font-lock-warning-face :height 1.8 :weight bold :underline f)))
+             '("*" (:inherit font-lock-warning-face :height 1.8 :weight bold)))
 
 (add-to-list 'org-emphasis-alist
              '("/" (:inherit font-lock-type-face :slant italic :height 145)))
@@ -84,6 +84,24 @@
 
 (require 'ob)
 (require 'ob-eval)
+
+(defvar org-babel-default-header-args:kusto
+  '((:results . "table") (:exports . "results"))
+  "Default arguments for evaluatiing a kusto source block.")
+
+(defun org-babel-execute:kusto (body params)
+  (let* ((temp-file (org-babel-temp-file "org-"))
+         (cmd (concat "powershell -noprofile -noninteractive "
+                      "C:/repos/scripts/invoke-kusto.ps1"
+                      " -QueryFile " temp-file)))
+    (with-temp-file temp-file (insert body))
+    (message "%s" cmd)
+    (org-babel-eval cmd "")
+    (message "temp-file: %s" temp-file)
+    (with-temp-buffer
+      (insert-file-contents temp-file)
+      (buffer-string))
+  ))
 
 (defvar org-babel-default-header-args:mermaid
   '((:results . "file") (:exports . "results"))
