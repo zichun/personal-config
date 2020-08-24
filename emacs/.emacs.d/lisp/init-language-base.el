@@ -81,6 +81,6 @@
 ;;   :hook (powershell-mode . (lambda () (require 'lsp-pwsh) (lsp)))
 ;;   :defer t)
 
-(require 'ra-emacs-lsp)
-
+                                        ;(require 'ra-emacs-lsp)
+(require 'init-language-rust)
 (provide 'init-language-base)

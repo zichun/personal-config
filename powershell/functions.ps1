@@ -13,12 +13,12 @@ function Curry($Name) {
         throw "Function name not specified"
     }
 
-    $func = Get-Item function:$Name
+    $func = Get-Item function:$Name;
 
     $closedFunc = [ScriptBlock]::Create($func.Definition);
-    $calledArgs = $args
+    $calledArgs = $args;
 
-    return { & $closedFunc @calledArgs @args }.GetNewClosure()
+    return { & $closedFunc @calledArgs @args }.GetNewClosure();
 }
 
 function Write-HostAndHighlightPattern(

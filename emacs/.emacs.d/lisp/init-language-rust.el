@@ -1,23 +1,19 @@
-(require 'company)
-(require 'racer)
+(require 'lsp-ui)
 (require 'rust-mode)
-(require 'flycheck)
-(require 'flycheck-rust)
 
-(add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
-(add-hook 'rust-mode-hook  #'company-mode)
-(add-hook 'rust-mode-hook  #'racer-mode)
-(add-hook 'rust-mode-hook  #'flycheck-mode)
-(add-hook 'racer-mode-hook #'eldoc-mode)
-(add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
+(setq lsp-rust-server 'rust-analyzer)
+(setq lsp-rust-analyzer-server-display-inlay-hints 't)
+(setq lsp-ui-doc-enable 'nil)
+(setq lsp-ui-sideline-code-actions-prefix " ")
+(setq lsp-ui-sideline-show-hover 't)
+
+(define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+(define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
+(define-key rust-mode-map (kbd "C-c C-t") 'rust-test)
+(define-key rust-mode-map (kbd "C-c C-c") 'rust-run)
+
 (add-hook 'rust-mode-hook
-          '(lambda ()
-	     (setq racer-cmd (concat (getenv "HOME") "/.cargo/bin/racer.exe"))
-	     (setq racer-rust-src-path (concat (getenv "HOME") "/.rustup/toolchains/stable-x86_64-pc-windows-msvc/lib/rustlib/src/rust/src"))
-             (local-set-key (kbd "TAB") #'company-indent-or-complete-common)
-	     (electric-pair-mode 1)))
-
-
-(setq company-tooltip-align-annotations t)
+          (lambda ()
+            (lsp)))
 
 (provide 'init-language-rust)
