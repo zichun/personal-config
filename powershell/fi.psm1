@@ -20,7 +20,9 @@ function Select-Interactive {
     end
     {
         try {
-            Start-FilterInteractive $Strings;
+            $sel = Start-FilterInteractive $Strings;
+            $sel | clip;
+            return $sel;
         } catch
         {
             write-host $_.ScriptStackTrace;
@@ -139,7 +141,7 @@ function Start-FilterInteractive {
             }
             elseif ($KeyString -eq 'Control+C' -or $KeyString -eq 'Enter')
             {
-                return;
+                return $Strings[$curIndex];
             }
             elseif ($KeyString -eq 'Escape')
             {
