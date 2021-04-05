@@ -1,8 +1,13 @@
 (require 'package)
+
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/") t)
 ; (add-to-list 'package-archives
 ;              '("marmalade" . "http://marmalade-repo.org/packages/"))
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
 (package-initialize)
 
 (defvar zichun/packages '(; misc / tools
@@ -53,8 +58,6 @@
                           js3-mode
                           web-mode
                           tide
-                          rust-mode
-                          flycheck-rust
 
                           ; UI
                           spaceline
@@ -71,6 +74,10 @@
                           subatomic256-theme
                           flatland-theme
                           badwolf-theme
+
+                          ; org
+                          org-superstar
+                          ob-rust
                           )
   "Default packages")
 

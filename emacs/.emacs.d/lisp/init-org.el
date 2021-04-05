@@ -1,44 +1,77 @@
 (require 'org)
+(require 'org-tempo)
 
-(setq org-directory "~/OneDrive/org")
-(setq org-default-notes-file (concat org-directory "/journal.org"))
-(setq org-default-journal-file (concat org-directory "/journal.org"))
-(setq org-default-todo-file (concat org-directory "/todo.org"))
-(setq org-default-personal-file (concat org-directory "/personal.org"))
-(setq org-catch-invisible-edits 'show-and-error)
+(defun zc/org-mode-setup ()
+  (org-indent-mode)
+  (auto-fill-mode 0)
+  (visual-line-mode 1))
 
-(setq org-agenda-files (quote (org-default-journal-file)))
+(use-package org
+  :defer t
+  :hook (org-mode . zc/org-mode-setup)
+  :config
+  (setq org-directory "~/OneDrive/org")
+  (setq org-default-notes-file (concat org-directory "/journal.org"))
+  (setq org-default-journal-file (concat org-directory "/journal.org"))
+  (setq org-default-todo-file (concat org-directory "/todo.org"))
+  (setq org-default-personal-file (concat org-directory "/personal.org"))
+  (setq org-catch-invisible-edits 'show-and-error)
 
-(setq org-capture-templates
-      '(    ;; ... other templates
-        ("t" "Todo"
-         entry
-         (file+headline org-default-todo-file "Tasks") "* TODO %?\n %i\n %a")
+  (setq org-agenda-files (quote (org-default-journal-file)))
 
-        ("j" "Journal Entry"
-         entry
-         (file+datetree org-default-journal-file)
-         "* %?"
-         :empty-lines 1)
+  (setq org-capture-templates
+        '(    ;; ... other templates
+          ("t" "Todo"
+           entry
+           (file+headline org-default-todo-file "Tasks") "* TODO %?\n %i\n %a")
 
-        ("p" "Personal Notes"
-         entry
-         (file+datetree org-default-personal-file)
-         "* %?"
-         :empty-lines 1)
-        ))
-(global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-ca" 'org-agenda)
-(global-set-key "\C-cc" 'org-capture)
-(global-set-key "\C-cb" 'org-iswitchb)
-(global-set-key "\C-cj" 'org-open-journal)
+          ("j" "Journal Entry"
+           entry
+           (file+datetree org-default-journal-file)
+           "* %?"
+           :empty-lines 1)
+
+          ("p" "Personal Notes"
+           entry
+           (file+datetree org-default-personal-file)
+           "* %?"
+           :empty-lines 1)
+          ))
+
+  ;; Enable inline highlighting for codeblocks
+  (setq org-src-fontify-natively t)
+  ;; set maximum indentation for description lists
+  (setq org-list-description-max-indent 5)
+  ;; prevent demoting heading also shifting text inside sections
+  (setq org-adapt-indentation nil)
+  ;; Hide emphasis char
+  (setq org-hide-emphasis-markers t)
+
+  (add-to-list 'org-emphasis-alist
+               '("*" (:inherit font-lock-warning-face :height 1.8 :weight bold)))
+
+  (add-to-list 'org-emphasis-alist
+               '("/" (:inherit font-lock-type-face :slant italic :height 145)))
+
+  (add-to-list 'org-emphasis-alist
+               '("_" (:inherit font-lock-function-name-face :height 145 :underline t)))
+
+  (add-to-list 'org-emphasis-alist
+               '("~" (:inherit font-lock-string-face))))
+
+(with-eval-after-load 'org
+  (bind-key "\C-c l" 'org-store-link)
+  (bind-key "\C-c a" 'org-agenda)
+  (bind-key "\C-c c" 'org-capture)
+  (bind-key "\C-c b" 'org-iswitchb)
+  (bind-key "\C-c j" 'org-open-journal))
 
 (defun org-open-journal()
   (interactive)
   (find-file org-default-journal-file))
 
-(defun org-outlook-open (path) (w32-shell-execute "open" "C:/Program Files (x86)/Microsoft Office/root/Office16/OUTLOOK.exe" (concat "outlook:" path)))
-(org-add-link-type "outlook" 'org-outlook-open)
+;;(defun org-outlook-open (path) (w32-shell-execute "open" "C:/Program Files (x86)/Microsoft Office/root/Office16/OUTLOOK.exe" (concat "outlook:" path)))
+;;(org-add-link-type "outlook" 'org-outlook-open)
 
 (defun org-insert-clipboard-image ()
   "Insert clipboard image into org"
@@ -46,31 +79,18 @@
   (call-process-shell-command "powershell.exe Get-OrgImageLink")
   (yank))
 
-;; Enable inline highlighting for codeblocks
-(setq org-src-fontify-natively t)
-;; set maximum indentation for description lists
-(setq org-list-description-max-indent 5)
-;; prevent demoting heading also shifting text inside sections
-(setq org-adapt-indentation nil)
-;; Hide emphasis char
-(setq org-hide-emphasis-markers t)
+;; (use-package org-bullets
+;;   :config
+;;   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
-(add-to-list 'org-emphasis-alist
-             '("*" (:inherit font-lock-warning-face :height 1.8 :weight bold)))
+(use-package org-superstar
+  :after org
+  :hook (org-mode . org-superstar-mode)
+  :custom
+  (org-superstar-remove-leading-stars t)
+  (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●")))
 
-(add-to-list 'org-emphasis-alist
-             '("/" (:inherit font-lock-type-face :slant italic :height 145)))
-
-(add-to-list 'org-emphasis-alist
-             '("_" (:inherit font-lock-function-name-face :height 145 :underline t)))
-
-(add-to-list 'org-emphasis-alist
-             '("~" (:inherit font-lock-string-face)))
-
-(use-package org-bullets
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-
+(set-face-attribute 'org-document-title nil :font "Consolas" :weight 'bold :height 1.3)
 (custom-theme-set-faces
  'user
  `(org-level-4 ((t :inherit outline-5 :height 1.3)))
@@ -78,9 +98,25 @@
  `(org-level-3 ((t :inherit outline-3 :font "Cambria" :height 1.3)))
  `(org-level-2 ((t :inherit outline-2 :font "Cambria" :height 1.25)))
  `(org-level-1 ((t :inherit outline-1 :font "Cambria" :height 1.25)))
- `(org-block-begin-line ((nil :font "Consolas" :height 0.8 :slant italic)))
- `(org-block ((t :background "#000"))))
+ `(org-block-begin-line ((nil :font "Consolas" :height 0.8 :slant italic))))
 
+;; Make sure org-indent face is available
+(require 'org-indent)
+
+;; ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+;; (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+;; (set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
+;; (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+;; (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+;; (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
+;; (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+;; (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+;; (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+;; (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+
+;; Get rid of the background on column views
+(set-face-attribute 'org-column nil :background nil)
+(set-face-attribute 'org-column-title nil :background nil)
 
 (require 'ob)
 (require 'ob-eval)
@@ -195,8 +231,13 @@ returned as a list."
          ((equal key :var) (push value vars)))))
     (list result-type vars)))
 
+(use-package ob-rust
+  :if (executable-find "rustc")
+  :init (add-to-list 'org-babel-load-languages '(rust . t)))
+
 ;; (org-babel-do-load-languages
 ;;       'org-babel-load-languages
 ;;       '((mermaid . t)))
+
 
 (provide 'init-org)

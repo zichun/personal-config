@@ -34,18 +34,6 @@
                   (interactive)
                   (ignore-errors (backward-char 5))))
 
-;; Expand-region
-(require 'expand-region)
-(global-set-key (kbd "C-=") 'er/expand-region)
-(global-set-key (kbd "C--") 'er/contract-region)
-
-;; Multiple-cursors
-(require 'multiple-cursors)
-(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-(global-set-key (kbd "C->") 'mc/mark-next-like-this)
-(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-
 ;; Highlight-symbols
 (global-set-key [(control f1)] 'hl-highlight-mode)
 (global-set-key [(control f2)] 'hl-highlight-thingatpt-local)

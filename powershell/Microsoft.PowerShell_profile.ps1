@@ -21,8 +21,8 @@ if ($host.Name -eq 'ConsoleHost')
     Import-Module "$PSScriptRoot\fi.psm1";
 }
 
-if ($env:ConEmuPID)
-{
+#if ($env:ConEmuPID)
+#{
     Import-Module 'oh-my-posh';
     if (-not (Test-Path "$($ThemeSettings.MyThemesLocation)\Paradox2.psm1"))
     {
@@ -31,7 +31,7 @@ if ($env:ConEmuPID)
     }
     Set-Theme 'Paradox2';
     $DefaultUser = $env:USERNAME;
-}
+#}
 
 # Set Up alias
 

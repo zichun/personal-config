@@ -63,3 +63,7 @@ Install-Module -Name 'oh-my-posh';
 # rustup update
 # rustup component add clippy --toolchain stable-x86_64-pc-windows-msvc
 # rustup component add rls rust-analysis rust-src;
+# cargo install rust-script
+#
+# choco install rust-analyzer -y
+

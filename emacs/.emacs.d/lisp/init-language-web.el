@@ -1,28 +1,45 @@
-(defun setup-tide-mode ()
-  (interactive)
-  (tide-setup)
-  (flycheck-mode +1)
+(use-package web-mode
+  :mode (("\\.tsx$" . web-mode)
+         ("\\.ts$" . web-mode))
+  :config
+
+  (defun my-tide-setup-hook ()
+    ;; configure tide
+    (tide-setup)
+    ;;enable eldoc-mode
+    (eldoc-mode)
+    ;; highlight identifiers
+    (tide-hl-identifier-mode +1)
+    ;; enable flycheck
+    (flycheck-mode)
+    ;; company-backends setup
+    (set (make-local-variable 'company-backends)
+         '((company-tide company-files :with company-yasnippet)
+           (company-dabbrev-code company-dabbrev)))
+
+    ;; enable typescript-tslint checker
+    (flycheck-add-mode 'typescript-tslint 'web-mode))
+
+  (defun html-setup ()
+    "Function to setup `html' configuration"
+    (emmet-mode)
+    (bind-key "C-c o b" #'browse-url-of-file (current-local-map)))
+
+  (add-hook 'web-mode-hook
+            (lambda ()
+              (pcase (file-name-extension buffer-file-name)
+                ("tsx" (my-tide-setup-hook))
+                ("ts" (my-tide-setup-hook))
+                ("html" (html-setup))))))
+
+(use-package tide
+  :ensure t
+  :after (typescript-mode company flycheck)
+  :hook ((typescript-mode . tide-setup)
+         (typescript-mode . tide-hl-identifier-mode)
+         (before-save . tide-format-before-save))
+  :config
   (setq flycheck-check-syntax-automatically '(save mode-enabled idle-change))
-  (eldoc-mode +1)
-  (tide-hl-identifier-mode +1)
-  ;; company is an optional dependency. You have to
-  ;; install it separately via package-install
-  ;; `M-x package-install [ret] company`
-  (company-mode +1))
-
-;; aligns annotation to the right hand side
-;(setq company-tooltip-align-annotations t)
-
-(add-hook 'typescript-mode-hook #'setup-tide-mode)
-
-;; format options
-(setq tide-format-options '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil))
-
-(require 'web-mode)
-(add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
-(add-hook 'web-mode-hook
-          (lambda ()
-            (when (string-equal "tsx" (file-name-extension buffer-file-name))
-              (setup-tide-mode))))
+  (setq tide-format-options '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil)))
 
 (provide 'init-language-web)

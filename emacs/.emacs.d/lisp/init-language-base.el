@@ -1,8 +1,6 @@
-;(add-hook 'after-init-hook 'global-company-mode)
-
-(require 'powershell)
-(autoload 'powershell-mode "powershell-mode" "A editing mode for Microsoft PowerShell." t)
-
+(use-package powershell
+  :config
+  (autoload 'powershell-mode "powershell-mode" "A editing mode for Microsoft PowerShell." t))
 
 ;; Enable gg-modes for c-mode
 
@@ -30,7 +28,6 @@
 
 (add-hook 'c-mode-common-hook
           'rainbow-delimiters-mode)
-
 
 (setq c-default-style
       '((java-mode . "java")
@@ -65,22 +62,8 @@
               (ggtags-mode 0)
               (flycheck-mode 0))))
 
-;; (require 'lsp-mode)
-;; (require 'lsp-ui)
-;; (add-hook 'c-mode-common-hook #'lsp)
-;; (add-hook 'lsp-mode-hook 'lsp-ui-mode)
-
-;; (require 'cquery)
-;; (setq cquery-executable "C:/tools/release/bin/cquery.exe")
-
-;; (use-package lsp-pwsh
-;;   :straight (lsp-pwsh
-;;              :host github
-;;              :repo "kiennq/lsp-powershell"
-;;              :files (:defaults "bin"))
-;;   :hook (powershell-mode . (lambda () (require 'lsp-pwsh) (lsp)))
-;;   :defer t)
-
                                         ;(require 'ra-emacs-lsp)
 (require 'init-language-rust)
+(require 'init-language-web)
+
 (provide 'init-language-base)
