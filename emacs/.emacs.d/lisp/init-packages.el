@@ -1,7 +1,9 @@
 (require 'package)
 
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/") t)
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("melpa-stable" . "https://stable.melpa.org/packages/")
+                         ("org" . "https://orgmode.org/elpa/")
+                         ("elpa" . "https://elpa.gnu.org/packages/")))
 ; (add-to-list 'package-archives
 ;              '("marmalade" . "http://marmalade-repo.org/packages/"))
 (unless (package-installed-p 'use-package)
@@ -77,7 +79,9 @@
 
                           ; org
                           org-superstar
+                          org-present
                           ob-rust
+                          org-tree-slide
                           )
   "Default packages")
 

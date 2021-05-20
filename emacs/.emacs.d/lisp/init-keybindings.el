@@ -35,7 +35,7 @@
                   (ignore-errors (backward-char 5))))
 
 ;; Highlight-symbols
-(global-set-key [(control f1)] 'hl-highlight-mode)
+;(global-set-key [(control f1)] 'hl-highlight-mode)
 (global-set-key [(control f2)] 'hl-highlight-thingatpt-local)
 (global-set-key [f2] 'hl-find-next-thing)
 (global-set-key [(shift f2)] 'hl-find-prev-thing)

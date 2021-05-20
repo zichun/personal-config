@@ -239,5 +239,68 @@ returned as a list."
 ;;       'org-babel-load-languages
 ;;       '((mermaid . t)))
 
+;;
+;; org-present
+;;
+
+(defun zc/org-present-prepare-slide ()
+  (org-overview)
+  (org-show-entry)
+  (org-show-children))
+
+(defun zc/org-present-hook ()
+  (setq-local face-remapping-alist '((default (:height 1.5) variable-pitch)
+                                     (header-line (:height 4.5) variable-pitch)
+                                     (org-code (:height 1.55) org-code)
+                                     (org-verbatim (:height 1.55) org-verbatim)
+                                     (org-block (:height 1.25) org-block)
+                                     (org-block-begin-line (:height 0.7) org-block)))
+  (setq header-line-format " ")
+  (org-display-inline-images)
+  (zc/org-present-prepare-slide))
+
+(defun zc/org-present-quit-hook ()
+  (setq-local face-remapping-alist '((default variable-pitch default)))
+  (setq header-line-format nil)
+  (org-present-small)
+  (org-remove-inline-images))
+
+(defun zc/org-present-prev ()
+  (interactive)
+  (org-present-prev)
+  (zc/org-present-prepare-slide))
+
+(defun zc/org-present-next ()
+  (interactive)
+  (org-present-next)
+  (zc/org-present-prepare-slide))
+
+(use-package org-present
+  :bind (:map org-present-mode-keymap
+         ("C-c C-n" . zc/org-present-next)
+         ("C-c C-p" . zc/org-present-prev))
+  :hook ((org-present-mode . zc/org-present-hook)
+         (org-present-mode-quit . zc/org-present-quit-hook)))
+
+(defun zc/org-start-presentation ()
+  (interactive)
+  (org-tree-slide-mode 1)
+  (setq text-scale-mode-amount 3)
+  (text-scale-mode 1))
+
+(defun zc/org-end-presentation ()
+  (interactive)
+  (text-scale-mode 0)
+  (org-tree-slide-mode 0))
+
+(use-package org-tree-slide
+  :defer t
+  :after org
+  :commands org-tree-slide-mode
+  :config
+  (setq org-tree-slide-slide-in-effect nil
+        org-tree-slide-activate-message "Presentation started."
+        org-tree-slide-deactivate-message "Presentation ended."
+        org-tree-slide-header t))
 
 (provide 'init-org)

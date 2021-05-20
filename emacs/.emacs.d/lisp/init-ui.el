@@ -64,14 +64,6 @@
 ;; (setq ido-use-faces nil)
 ;; (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
 
-(ivy-mode 1)
-(setq ivy-dynamic-exhibit-delay-ms 250)
-(setq ivy-use-virtual-buffers t)
-(setq ivy-count-format "(%d/%d) ")
-(setq ivy-re-builders-alist
-      '((swiper . ivy--regex-plus)
-        (t      . ivy--regex-fuzzy)))
-
 ;; (use-package spaceline
 ;;   :demand t
 ;;   :init
@@ -198,7 +190,39 @@
   :config
   (save-place-mode 1))
 
+(use-package ivy
+  :diminish
+  :bind (("C-s" . swiper)
+         :map ivy-minibuffer-map
+         ("TAB" . ivy-alt-done)
+         ("C-f" . ivy-alt-done)
+         ("C-l" . ivy-alt-done)
+         ("C-j" . ivy-next-line)
+         ("C-k" . ivy-previous-line)
+         :map ivy-switch-buffer-map
+         ("C-k" . ivy-previous-line)
+         ("C-l" . ivy-done)
+         ("C-d" . ivy-switch-buffer-kill)
+         :map ivy-reverse-i-search-map
+         ("C-k" . ivy-previous-line)
+         ("C-d" . ivy-reverse-i-search-kill))
+  :init
+  (ivy-mode 1)
+  :config
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-wrap t)
+  (setq ivy-count-format "(%d/%d) ")
+  (setq enable-recursive-minibuffers t)
+
+ (setq ivy-dynamic-exhibit-delay-ms 250)
+ (setq ivy-use-virtual-buffers t)
+ (setq ivy-count-format "(%d/%d) ")
+ (setq ivy-re-builders-alist
+       '((swiper . ivy--regex-plus)
+         (t      . ivy--regex-fuzzy))))
+
 (use-package ivy-posframe
+;  :disabled
   :after ivy
   :diminish
   :config
@@ -212,7 +236,7 @@
   (setq ivy-posframe-border-width 10)
   (setq ivy-posframe-parameters '((internal-border-width . 10) (font . "Cascadia Code")))
   (setq ivy-posframe-width 700)
-  (ivy-posframe-mode +1))
+  (ivy-posframe-mode 1))
 
 (use-package which-key
   :ensure

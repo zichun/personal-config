@@ -1,4 +1,7 @@
-(setq gc-cons-threshold 100000000)
+(setq gc-cons-threshold (* 50 1000 1000))
+(setq comp-async-report-warnings-errors nil)
+(set-default-coding-systems 'utf-8)
+
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 
 (when window-system
