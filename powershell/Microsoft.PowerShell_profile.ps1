@@ -23,7 +23,7 @@ if ($host.Name -eq 'ConsoleHost')
 
 #if ($env:ConEmuPID)
 #{
-    Import-Module 'oh-my-posh';
+    Import-Module 'oh-my-posh' -MaximumVersion '2.1';
     if (-not (Test-Path "$($ThemeSettings.MyThemesLocation)\Paradox2.psm1"))
     {
         mkdir $ThemeSettings.MyThemesLocation -ErrorAction SilentlyContinue;

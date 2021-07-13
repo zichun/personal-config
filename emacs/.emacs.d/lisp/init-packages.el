@@ -15,7 +15,7 @@
 (defvar zichun/packages '(; misc / tools
                           use-package
                           auto-complete
-                          autopair
+;                          autopair
                           gist
                           htmlize
 ;                          marmalade

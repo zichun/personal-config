@@ -53,7 +53,7 @@ cd $env:USERPROFILE;
 cd fonts;
 .\install.ps1;
 
-Install-Module -Name 'oh-my-posh';
+Install-Module -Name 'oh-my-posh' -RequiredVersion '2.0.245';
 
 #
 # rust

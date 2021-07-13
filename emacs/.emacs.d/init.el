@@ -91,7 +91,7 @@
  '(markdown-command "pandoc")
  '(org-agenda-files '("~/OneDrive/org/journal.org"))
  '(package-selected-packages
-   '(msvc deadgrep spaceline-all-the-icons anzu spaceline spacemacs-theme cquery ccls dash lsp-ui lsp-mode rust-playground flycheck-rust rust-mode js2-mode zen-mode counsel-gtags counsel swiper ivy ripgrep prog-fill org-mime shell-pop git-messenger itail git-gutter origami zzz-to-char irony flycheck-clangcheck flycheck tide hl-anything less-css-mode web-mode typescript-mode gratuitous-dark-theme magit yaml-mode subatomic256-theme smex restclient rainbow-delimiters projectile powershell omnisharp multiple-cursors monokai-theme molokai-theme material-theme markdown-mode log4j-mode ido-vertical-mode highlight2clipboard groovy-mode gist ggtags fsharp-mode flx-ido flatland-theme expand-region csharp-mode company badwolf-theme autopair))
+   '(msvc deadgrep spaceline-all-the-icons anzu spaceline spacemacs-theme cquery ccls dash lsp-ui lsp-mode rust-playground flycheck-rust rust-mode js2-mode zen-mode counsel-gtags counsel swiper ivy ripgrep prog-fill org-mime shell-pop git-messenger itail git-gutter origami zzz-to-char irony flycheck-clangcheck flycheck tide hl-anything less-css-mode web-mode typescript-mode gratuitous-dark-theme magit yaml-mode subatomic256-theme smex restclient rainbow-delimiters projectile powershell omnisharp multiple-cursors monokai-theme molokai-theme material-theme markdown-mode log4j-mode ido-vertical-mode highlight2clipboard groovy-mode gist ggtags fsharp-mode flx-ido flatland-theme expand-region csharp-mode company badwolf-theme))
  '(pos-tip-background-color "#FFFACE")
  '(pos-tip-foreground-color "#272822")
  '(vc-annotate-background nil)
