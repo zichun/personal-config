@@ -303,4 +303,6 @@ returned as a list."
         org-tree-slide-deactivate-message "Presentation ended."
         org-tree-slide-header t))
 
+(setq org-clock-sound "~/personal-config/emacs/bell.wav")
+
 (provide 'init-org)
