@@ -40,6 +40,10 @@
 
   ;; Enable inline highlighting for codeblocks
   (setq org-src-fontify-natively t)
+  (setq org-fontify-quote-and-verse-blocks t)
+  (setq org-src-tab-acts-natively t)
+  (setq org-edit-src-content-indentation 2)
+  (setq org-src-preserve-indentation nil)
   ;; set maximum indentation for description lists
   (setq org-list-description-max-indent 5)
   ;; prevent demoting heading also shifting text inside sections
