@@ -65,5 +65,6 @@
                                         ;(require 'ra-emacs-lsp)
 (require 'init-language-rust)
 (require 'init-language-web)
+(require 'init-language-cpp)
 
 (provide 'init-language-base)

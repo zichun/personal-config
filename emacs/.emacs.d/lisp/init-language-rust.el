@@ -29,7 +29,7 @@
   :custom
   ;; what to use when checking on-save. "check" is default, I prefer clippy
                                         ;  (lsp-rust-analyzer-cargo-watch-command "clippy")
-  (lsp-rust-server 'rust-analyzer)
+  (rustic-lsp-server 'rust-analyzer)
   (lsp-rust-analyzer-server-display-inlay-hints 't)
   (lsp-eldoc-render-all t)
   (lsp-idle-delay 0.6)
@@ -57,7 +57,7 @@
 	    ("M-<". company-select-first)
 	    ("M->". company-select-last)))
 
-(use-package flycheck :ensure)
+;(use-package flycheck :ensure)
 (use-package toml-mode :ensure)
 
 ;; (require 'lsp-ui)

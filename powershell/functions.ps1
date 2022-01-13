@@ -168,7 +168,7 @@ ${Function:Write-HostOutput} = & {
 
             while ($index -lt $text.length) {
                 $len = [Math]::Min($text.length - $index, $maxWidth - $cursor.X);
-                $row = $Host.UI.RawUI.NewBufferCellArray($text.Substring($index, $len), $foreground, $background);
+                $row = $Host.UI.RawUI.NewBufferCellArray($text.ToString().Substring($index, $len), $foreground, $background);
                 $Host.UI.RawUI.SetBufferContents($cursor, $row);
 
                 $cursor.X += $len;
@@ -969,8 +969,8 @@ function Group-ObjectTree {
         $objHash = @{};
         foreach ($o in $objects)
         {
-            $objHash[$o.$Identifier] = @{
-                'Identifier' = $o.$Identifier;
+            $objHash[$o.$Identifier.ToString()] = @{
+                'Identifier' = $o.$Identifier.ToString();
                 'Object' = $o;
                 'Children' = @();
             };
@@ -978,15 +978,15 @@ function Group-ObjectTree {
 
         foreach ($o in $objects)
         {
-            $key = $o.$ParentKey;
+            $key = $o.$ParentKey.ToString();
             if ($key -and $objHash.ContainsKey($key))
             {
                 $parent = $objHash[$key];
-                $parent.Children += ,($objHash[$o.$Identifier]);
+                $parent.Children += ,($objHash[$o.$Identifier.ToString()]);
             }
             else
             {
-                $tr += ,($objHash[$o.$Identifier]);
+                $tr += ,($objHash[$o.$Identifier.ToString()]);
             }
         }
         return $tr;
@@ -1180,5 +1180,13 @@ function Invoke-Environment
 
     if ($LASTEXITCODE) {
         throw "Command '$Command': exit code: $LASTEXITCODE"
+    }
+}
+
+$rename = Get-Command RenameTab -erroraction 'ignore';
+if (-not $rename)
+{
+    function RenameTab($name) {
+        $host.ui.rawui.WindowTitle = $name;
     }
 }
