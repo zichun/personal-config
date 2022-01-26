@@ -55,15 +55,20 @@ cd fonts;
 
 Install-Module -Name 'oh-my-posh' -RequiredVersion '2.0.245';
 
+npm install -g mermaid.cli;
+
+#
+# Launch emacs, M-x all-the-icons-install-font
+#
+
 #
 # rust
 #
-# choco install rustup;
-#
-# rustup update
-# rustup component add clippy --toolchain stable-x86_64-pc-windows-msvc
-# rustup component add rls rust-analysis rust-src;
-# cargo install rust-script
-#
-# choco install rust-analyzer -y
+choco install rustup.install -y;
+
+rustup update
+rustup component add clippy --toolchain stable-x86_64-pc-windows-msvc
+rustup component add rls rust-analysis rust-src;
+cargo install rust-script
+choco install rust-analyzer -y;
 
