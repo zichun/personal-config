@@ -51,6 +51,7 @@
                           magit
 
                           ; language modes
+                          rustic
                           lsp-mode
                           lsp-ui
                           csharp-mode
