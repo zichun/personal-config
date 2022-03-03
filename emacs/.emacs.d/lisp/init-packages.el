@@ -70,6 +70,8 @@
                           ivy-posframe
                           ivy-rich
                           org-bullets
+                          svg-tag-mode
+                          olivetti
 
                           ; themes
                           molokai-theme
