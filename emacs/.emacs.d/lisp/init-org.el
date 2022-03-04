@@ -15,9 +15,9 @@
    'user
    `(org-level-5 ((t :inherit outline-5 :height 1.1)))
    `(org-level-4 ((t :inherit outline-4 :height 1.15)))
-   `(org-level-3 ((t :inherit outline-3 :font "Cambria" :height 1.35)))
-   `(org-level-2 ((t :inherit outline-2 :font "Cambria" :height 1.65)))
-   `(org-level-1 ((t :inherit outline-1 :font "Cambria" :height 2.0 :background "black")))
+   `(org-level-3 ((t :inherit outline-3 :font "Cambria" :height 1.35 :underline (:color foreground-color :style line) :overline (:color foreground-color :style line))))
+   `(org-level-2 ((t :inherit outline-2 :font "Cambria" :height 1.65 :underline (:color foreground-color :style line) :overline (:color foreground-color :style line))))
+   `(org-level-1 ((t :inherit outline-1 :font "Cambria" :height 2.0 :underline (:color foreground-color :style line) :overline (:color foreground-color :style line))))
    `(org-block-begin-line ((nil :font "Consolas" :height 0.8 :slant italic))))
   )
 
@@ -32,7 +32,7 @@
   (setq org-default-personal-file (concat org-directory "/personal.org"))
   (setq org-catch-invisible-edits 'show-and-error)
 
-  (setq org-agenda-files (quote (org-default-journal-file)))
+  (setq org-agenda-files (list `,org-default-journal-file))
 
   (setq org-capture-templates
         '(    ;; ... other templates
@@ -112,7 +112,7 @@
   :hook (org-mode . org-superstar-mode)
   :custom
   (org-superstar-remove-leading-stars t)
-  (org-superstar-headline-bullets-list '("●" "◉" "○" "○" "●" "○" "●")))
+  (org-superstar-headline-bullets-list '("‣" "•" "○" "○" "●" "○" "●")))
 
 ;; Make sure org-indent face is available
 (require 'org-indent)
