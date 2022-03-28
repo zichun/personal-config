@@ -45,6 +45,23 @@ New-Item -ItemType SymbolicLink -Path "$($env:USERPROFILE)" -Name '.ripgreprc' -
 cd "$($env:USERPROFILE)\personal-config\cmder";
 New-Item -ItemType SymbolicLink -Path \tools\Cmder\vendor\conemu-maximus5\ -Name 'ConEmu.xml' -Target "$($pwd.path)\ConEmu.xml";
 
+# WindowsTerminal config
+cd "$($env:USERPROFILE)\personal-config\terminal";
+$dir = Get-ChildItem '~\AppData\Local\Packages\Microsoft.WindowsTerminal*';
+if (-not $dir)
+{
+    Write-Warning 'Cannot find WindowsTerminal in AppData';
+}
+else
+{
+    $settings = "$($dir[0].FullName)\LocalState\settings.json";
+    if (Test-Path $settings)
+    {
+        move $settings "$settings.old";
+    }
+    New-Item -ItemType SymbolicLink -Path "$($dir[0].FullName)\LocalState\" -Name 'settings.json' -Target "$($pwd.path)\settings.json";
+}
+
 #
 # Setup Powerline
 #
