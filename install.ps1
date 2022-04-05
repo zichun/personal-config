@@ -11,7 +11,9 @@ choco install nodejs -y;
 choco install python -y;
 choco install pwsh -y;
 choco install poshgit -y;
+
 choco install choco install visualstudio2019community -y;
+choco install visualstudio2019-workload-nativedesktop -y
 
 Install-Module -Name PowerShellGet -Force;
 Install-Module posh-git -Scope CurrentUser -Force;
