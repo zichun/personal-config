@@ -158,7 +158,7 @@
 	 (background-color (cdr (assoc :background-color params)))
      (temp-file (org-babel-temp-file "mermaid-"))
      (cmd (concat "pwsh"
-                  " -NonInteractive -NoProfile C:/Users/kzc16/AppData/Roaming/npm/mmdc.ps1 "
+                  " -NonInteractive -NoProfile %HOME%/AppData/Roaming/npm/mmdc.ps1 "
                   " -i " temp-file
                   " -o " out-file
                   (when theme
