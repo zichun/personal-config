@@ -28,6 +28,7 @@
                           hl-anything
                           git-messenger
                           git-gutter
+                          git-gutter-fringe
                           ivy
                           swiper
                           counsel

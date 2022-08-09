@@ -1013,44 +1013,75 @@ function Out-Tree {
         $objects += $Tree
     }
     end {
+        $objects | Out-TreeScriptBlock -Script {
+            param($Object, $Prefix)
+            Write-HostOutput $Prefix -NoNewLine;
+            if ($Identifier.GetType().Name -eq 'ScriptBlock')
+            {
+                $toPrint = $Object | % $Identifier;
+                Write-HostOutput $toPrint;
+            }
+            elseif ($Identifier.GetType().Name -eq 'String' -and $Identifier)
+            {
+                Write-HostOutput $Object.$Identifier;
+            }
+            else
+            {
+                Write-HostOutput $Object.Identifier;
+            }
+        };
+    }
+}
+
+function Out-TreeScriptBlock {
+    param(
+ 		[Parameter(Position=5,Mandatory=$true, ValueFromPipeline=$true)]
+        $Tree,
+ 		[Parameter(Position=0)]
+        [ScriptBlock]$Script,
+ 		[Parameter(Position=1)]
+        [ScriptBlock]$ShowChildren = { param($Object) write-output true; },
+ 		[Parameter(Position=2)]
+        $Spacing = 4,
+ 		[Parameter(Position=3)]
+        $Depth = 0,
+ 		[Parameter(Position=4)]
+        $LastArr = @()
+    )
+    begin {
+        $objects = @();
+    }
+    process {
+        $objects += $Tree
+    }
+    end {
         for ($j = 0; $j -lt $objects.Count; ++$j)
         {
             $t = $objects[$j];
             $isLast = $j -eq ($objects.Count - 1);
+            $prefix = '';
 
             for ($i = 0; $i -lt $Depth - 1; ++$i)
             {
                 if ($LastArr[$i + 1])
                 {
-                    Write-HostOutput (' ' * $Spacing) -NoNewLine;
+                    $prefix += ' ' * $Spacing;
                 }
                 else
                 {
-                    Write-HostOutput '|' -NoNewLine;
-                    Write-HostOutput (' ' * ($Spacing - 1)) -NoNewLine;
+                    $prefix += '|' + (' ' * ($Spacing - 1));
                 }
             }
             if ($Depth -gt 0)
             {
-                Write-HostOutput '|' -NoNewLine;
-                Write-HostOutput ('-' * ($Spacing - 1)) -NoNewLine;
+                $prefix += '|' + ('-' * ($Spacing - 1));
             }
 
-            if ($Identifier.GetType().Name -eq 'ScriptBlock')
+            & $Script -Object $t.Object -Prefix $prefix -Children $t.Children;
+            if (& $ShowChildren -Object $t.Object)
             {
-                $toPrint = $t.Object | % $Identifier;
-                Write-HostOutput $toPrint;
+                $t.Children | Out-TreeScriptBlock -Script $Script -ShowChildren $ShowChildren -Depth ($Depth + 1) -Spacing $Spacing -LastArr ($LastArr + $isLast);
             }
-            elseif ($Identifier.GetType().Name -eq 'String' -and $Identifier)
-            {
-                Write-HostOutput $t.Object.$Identifier;
-            }
-            else
-            {
-                Write-HostOutput $t.Identifier;
-            }
-
-            $t.Children | Out-Tree -Identifier $Identifier -Depth ($Depth + 1) -Spacing $Spacing -LastArr ($LastArr + $isLast);
         }
     }
 }
