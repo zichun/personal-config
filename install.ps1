@@ -11,7 +11,9 @@ choco install nodejs -y;
 choco install python -y;
 choco install pwsh -y;
 choco install poshgit -y;
+
 choco install choco install visualstudio2019community -y;
+choco install visualstudio2019-workload-nativedesktop -y
 
 Install-Module -Name PowerShellGet -Force;
 Install-Module posh-git -Scope CurrentUser -Force;
@@ -45,6 +47,23 @@ New-Item -ItemType SymbolicLink -Path "$($env:USERPROFILE)" -Name '.ripgreprc' -
 cd "$($env:USERPROFILE)\personal-config\cmder";
 New-Item -ItemType SymbolicLink -Path \tools\Cmder\vendor\conemu-maximus5\ -Name 'ConEmu.xml' -Target "$($pwd.path)\ConEmu.xml";
 
+# WindowsTerminal config
+cd "$($env:USERPROFILE)\personal-config\terminal";
+$dir = Get-ChildItem '~\AppData\Local\Packages\Microsoft.WindowsTerminal*';
+if (-not $dir)
+{
+    Write-Warning 'Cannot find WindowsTerminal in AppData';
+}
+else
+{
+    $settings = "$($dir[0].FullName)\LocalState\settings.json";
+    if (Test-Path $settings)
+    {
+        move $settings "$settings.old";
+    }
+    New-Item -ItemType SymbolicLink -Path "$($dir[0].FullName)\LocalState\" -Name 'settings.json' -Target "$($pwd.path)\settings.json";
+}
+
 #
 # Setup Powerline
 #
@@ -55,15 +74,20 @@ cd fonts;
 
 Install-Module -Name 'oh-my-posh' -RequiredVersion '2.0.245';
 
+npm install -g mermaid.cli;
+
+#
+# Launch emacs, M-x all-the-icons-install-font
+#
+
 #
 # rust
 #
-# choco install rustup;
-#
-# rustup update
-# rustup component add clippy --toolchain stable-x86_64-pc-windows-msvc
-# rustup component add rls rust-analysis rust-src;
-# cargo install rust-script
-#
-# choco install rust-analyzer -y
+choco install rustup.install -y;
+
+rustup update
+rustup component add clippy --toolchain stable-x86_64-pc-windows-msvc
+rustup component add rls rust-analysis rust-src;
+cargo install rust-script
+choco install rust-analyzer -y;
 

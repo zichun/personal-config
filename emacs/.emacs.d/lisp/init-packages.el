@@ -28,6 +28,7 @@
                           hl-anything
                           git-messenger
                           git-gutter
+                          git-gutter-fringe
                           ivy
                           swiper
                           counsel
@@ -51,6 +52,7 @@
                           magit
 
                           ; language modes
+                          rustic
                           lsp-mode
                           lsp-ui
                           csharp-mode
@@ -69,6 +71,8 @@
                           ivy-posframe
                           ivy-rich
                           org-bullets
+                          svg-tag-mode
+                          olivetti
 
                           ; themes
                           molokai-theme

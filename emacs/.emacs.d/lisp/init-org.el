@@ -4,7 +4,22 @@
 (defun zc/org-mode-setup ()
   (org-indent-mode)
   (auto-fill-mode 0)
-  (visual-line-mode 1))
+  (visual-line-mode 1)
+
+  ;; Get rid of the background on column views
+  (set-face-attribute 'org-column nil :background nil)
+  (set-face-attribute 'org-column-title nil :background nil)
+
+  (set-face-attribute 'org-document-title nil :font "Consolas" :weight 'bold :height 1.3)
+  (custom-theme-set-faces
+   'user
+   `(org-level-5 ((t :inherit outline-5 :height 1.1)))
+   `(org-level-4 ((t :inherit outline-4 :height 1.15)))
+   `(org-level-3 ((t :inherit outline-3 :font "Cambria" :height 1.35 :underline (:color foreground-color :style line) :overline (:color foreground-color :style line))))
+   `(org-level-2 ((t :inherit outline-2 :font "Cambria" :height 1.65 :underline (:color foreground-color :style line) :overline (:color foreground-color :style line))))
+   `(org-level-1 ((t :inherit outline-1 :font "Cambria" :height 2.0 :underline (:color foreground-color :style line) :overline (:color foreground-color :style line))))
+   `(org-block-begin-line ((nil :font "Consolas" :height 0.8 :slant italic))))
+  )
 
 (use-package org
   :defer t
@@ -17,7 +32,7 @@
   (setq org-default-personal-file (concat org-directory "/personal.org"))
   (setq org-catch-invisible-edits 'show-and-error)
 
-  (setq org-agenda-files (quote (org-default-journal-file)))
+  (setq org-agenda-files (list `,org-default-journal-file))
 
   (setq org-capture-templates
         '(    ;; ... other templates
@@ -50,6 +65,11 @@
   (setq org-adapt-indentation nil)
   ;; Hide emphasis char
   (setq org-hide-emphasis-markers t)
+
+  ;; whole heading line is fontified
+  (setq org-fontify-whole-heading-line t
+        org-fontify-done-headline t
+        org-fontify-quote-and-verse-blocks t)
 
   (add-to-list 'org-emphasis-alist
                '("*" (:inherit font-lock-warning-face :height 1.8 :weight bold)))
@@ -92,17 +112,7 @@
   :hook (org-mode . org-superstar-mode)
   :custom
   (org-superstar-remove-leading-stars t)
-  (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●")))
-
-(set-face-attribute 'org-document-title nil :font "Consolas" :weight 'bold :height 1.3)
-(custom-theme-set-faces
- 'user
- `(org-level-4 ((t :inherit outline-5 :height 1.3)))
- `(org-level-4 ((t :inherit outline-4 :height 1.5)))
- `(org-level-3 ((t :inherit outline-3 :font "Cambria" :height 1.3)))
- `(org-level-2 ((t :inherit outline-2 :font "Cambria" :height 1.25)))
- `(org-level-1 ((t :inherit outline-1 :font "Cambria" :height 1.25)))
- `(org-block-begin-line ((nil :font "Consolas" :height 0.8 :slant italic))))
+  (org-superstar-headline-bullets-list '("‣" "•" "○" "○" "●" "○" "●")))
 
 ;; Make sure org-indent face is available
 (require 'org-indent)
@@ -117,10 +127,6 @@
 ;; (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
 ;; (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
 ;; (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
-
-;; Get rid of the background on column views
-(set-face-attribute 'org-column nil :background nil)
-(set-face-attribute 'org-column-title nil :background nil)
 
 (require 'ob)
 (require 'ob-eval)
