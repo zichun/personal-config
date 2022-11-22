@@ -80,7 +80,7 @@
                           subatomic256-theme
                           flatland-theme
                           badwolf-theme
-                          vscode-dark-plus
+                          vscode-dark-plus-theme
 
                           ; org
                           org-superstar
