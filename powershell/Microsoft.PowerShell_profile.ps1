@@ -14,7 +14,10 @@ if ($host.Name -eq 'ConsoleHost')
     # Out-default wrapper.
     Import-Module "$PSScriptRoot\Out-DefaultWrapper.ps1";
 
-    # Common Functions
+    # Common Utilities
+    Import-Module "$PSScriptRoot\utilities.ps1";
+
+    # Common Functions (specific to personal)
     Import-Module "$PSScriptRoot\Functions.ps1";
 
     # Filter Interactive
@@ -37,8 +40,8 @@ if ($host.Name -eq 'ConsoleHost')
 
 Set-Alias dirs Find-File;
 Set-Alias grep Find-String;
-Set-Alias highlight Highlight-String;
-Set-Alias hi Highlight-String;
+Set-Alias highlight Write-HighlightString;
+Set-Alias hi Write-HighlightString;
 Set-Alias glr Get-LastResult;
 Set-Alias glc Get-LastCommand;
 Set-Alias sin Select-Interactive;

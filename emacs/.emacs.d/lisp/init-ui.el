@@ -151,7 +151,7 @@
         doom-themes-enable-italic t) ; if nil, italics is universally disabled
   ;; Load the theme (doom-one, doom-molokai, etc); keep in mind that each theme
   ;; may have their own settings.
-  (load-theme 'doom-vibrant t)
+  (load-theme 'vscode-dark-plus t)
   (doom-themes-org-config))
 
 ;; (use-package solaire-mode
