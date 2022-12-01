@@ -43,7 +43,10 @@
   :custom
   (lsp-ui-peek-always-show t)
   (lsp-ui-sideline-show-hover t)
-  (lsp-ui-doc-enable nil))
+  (lsp-ui-doc-enable nil)
+
+  :bind (("C-M-." . lsp-ui-peek-find-definitions))
+  )
 
 (use-package company
   :ensure
