@@ -44,7 +44,7 @@
 ;;
 
 ;(load-theme 'monokai t)
-(set-face-attribute 'default nil :height 120)
+(set-face-attribute 'default nil :height 125)
 (when window-system
   (set-face-attribute 'default nil :font "Cascadia Code")
   (setq-default line-spacing 3))

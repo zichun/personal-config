@@ -62,6 +62,8 @@
                           js3-mode
                           web-mode
                           tide
+                          yasnippet
+                          flycheck-rust
 
                           ; UI
                           spaceline

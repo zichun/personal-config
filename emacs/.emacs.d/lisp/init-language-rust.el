@@ -45,13 +45,19 @@
   (lsp-ui-sideline-show-hover t)
   (lsp-ui-doc-enable nil)
 
-  :bind (("C-M-." . lsp-ui-peek-find-definitions))
+  :bind (
+         ("C-M-." . lsp-ui-peek-find-definitions)
+         ("C-?" . eldoc-doc-buffer)
+         )
   )
 
 (use-package company
-  :ensure
+  :hook (prog-mode . company-mode)
+  :config
+  (setq company-tooltip-align-annotations t)
+  (setq company-minimum-prefix-length 1)
   :custom
-  (company-idle-delay 0.5) ;; how long to wait until popup
+  (company-idle-delay 0.3) ;; how long to wait until popup
   ;; (company-begin-commands nil) ;; uncomment to disable popup
   :bind
   (:map company-active-map
@@ -60,7 +66,18 @@
 	    ("M-<". company-select-first)
 	    ("M->". company-select-last)))
 
-;(use-package flycheck :ensure)
+(use-package yasnippet
+  :ensure
+  :config
+  (yas-reload-all)
+  (add-hook 'prog-mode-hook 'yas-minor-mode)
+  (add-hook 'text-mode-hook 'yas-minor-mode))
+
+(use-package flycheck
+  :hook (prog-mode . flycheck-mode))
+(use-package flycheck-rust
+  :config (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+
 (use-package toml-mode :ensure)
 
 ;; (require 'lsp-ui)
