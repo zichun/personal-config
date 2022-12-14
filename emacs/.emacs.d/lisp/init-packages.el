@@ -10,7 +10,7 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-(package-initialize)
+;(package-initialize)
 
 (defvar zichun/packages '(; misc / tools
                           use-package
