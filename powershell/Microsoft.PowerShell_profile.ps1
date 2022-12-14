@@ -25,13 +25,25 @@ if ($host.Name -eq 'ConsoleHost')
 }
 
 Import-Module 'oh-my-posh' -MaximumVersion '2.1';
-if (-not (Test-Path "$($ThemeSettings.MyThemesLocation)\Paradox2.psm1"))
-{
-    mkdir $ThemeSettings.MyThemesLocation -ErrorAction SilentlyContinue;
+if (-not (Test-Path "$($ThemeSettings.MyThemesLocation)\Paradox2.psm1")) {
+    if (-not (Test-Path $ThemeSettings.MyThemesLocation)) {
+        if ($env:OS -eq 'Windows_NT') {
+            mkdir $ThemeSettings.MyThemesLocation;
+        } else {
+            $path = $ThemeSettings.MyThemesLocation -replace '\\','/';
+            $path = $path -replace '~',$env:HOME;
+            mkdir -p $path;
+        }
+    }
     copy "$($PSScriptRoot)\Paradox2.psm1" "$($ThemeSettings.MyThemesLocation)\Paradox2.psm1";
 }
 Set-Theme 'Paradox2';
-$DefaultUser = $env:USERNAME;
+
+if ($env:OS -eq 'Windows_NT') {
+    $DefaultUser = $env:USERNAME;
+} else {
+    $DefaultUser = $env:USER;
+}
 
 # Set Up alias
 
@@ -102,9 +114,13 @@ Set-Alias sin Select-Interactive;
 # }
 
 function Test-IsAdmin {
-    $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent();
-    $principal = new-object Security.Principal.WindowsPrincipal($currentUser);
-    $principal.IsInRole("Administrators");
+    if ($env:OS -eq 'Windows_NT') {
+        $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent();
+        $principal = new-object Security.Principal.WindowsPrincipal($currentUser);
+        $principal.IsInRole("Administrators");
+    } else {
+        return $env:USER -eq 'root';
+    }
 }
 
 $Global:IsCurrentUserAdministrator = Test-IsAdmin
@@ -115,44 +131,70 @@ if (Test-Path($ChocolateyProfile)) {
     Import-Module "$ChocolateyProfile";
 }
 
+function em {
+    param($p1, $p2, $p3, $p4)
+    if ($env:OS -eq 'Windows_NT') {
+        emacs $p1 $p2 $p3 $p4;
+    } else {
+        if (Get-Process emacs) {
+            emacsclientw -n --no-wait $p1 $p2 $p3 $p4;
+        } else {
+            emacs $p1 $p2 $p3 $p4;
+        }
+    }
+}
+
 function e {
     param($p1, $p2, $p3, $p4)
-    emacs.exe -nw $p1 $p2 $p3 $p4;
+    if ($env:OS -eq 'Windows_NT') {
+        emacs.exe -nw $p1 $p2 $p3 $p4;
+    } else {
+        emacs -nw $p1 $p2 $p3 $p4;
+    }
 }
 
 function emacs {
     param($p1, $p2, $p3, $p4)
-    if ($p1)
-    {
-        emacsclientw.exe -n --no-wait --alternate-editor="runemacs.exe" $p1 $p2 $p3 $p4;
-        return;
-    }
 
-    $emacs = Get-Process | Where-Object {$_.Name -like "emacs"};
-    if ($emacs)
-    {
-Add-Type @"
-    using System;
-    using System.Runtime.InteropServices;
-    public class WinAp {
-      [DllImport("user32.dll")]
-      [return: MarshalAs(UnmanagedType.Bool)]
-      public static extern bool SetForegroundWindow(IntPtr hWnd);
+    if ($env:OS -eq 'Windows_NT') {
+        if ($p1)
+        {
+            emacsclientw.exe -n --no-wait --alternate-editor="runemacs.exe" $p1 $p2 $p3 $p4;
+            return;
+        }
 
-      [DllImport("user32.dll")]
-      [return: MarshalAs(UnmanagedType.Bool)]
-      public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-    }
+        $emacs = Get-Process | Where-Object {$_.Name -like "emacs"};
+        if ($emacs)
+        {
+            Add-Type @"
+using System;
+using System.Runtime.InteropServices;
+public class WinAp {
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool SetForegroundWindow(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+}
 "@
-        $h = $emacs.MainWindowHandle;
-        [void] [WinAp]::SetForegroundWindow($h);
+            $h = $emacs.MainWindowHandle;
+            [void] [WinAp]::SetForegroundWindow($h);
 
-#        [void] [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.VisualBasic");
-#        [Microsoft.VisualBasic.Interaction]::AppActivate($emacs.Id);
-    }
-    else
-    {
-        emacsclientw.exe -n --no-wait --alternate-editor="runemacs.exe" -e '';
+            #        [void] [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.VisualBasic");
+            #        [Microsoft.VisualBasic.Interaction]::AppActivate($emacs.Id);
+        }
+        else
+        {
+            emacsclientw.exe -n --no-wait --alternate-editor="runemacs.exe" -e '';
+        }
+    } else {
+        if (Get-Process emacs -ErrorAction 'SilentlyContinue') {
+            emacsclient -n --no-wait $p1 $p2 $p3 $p4;
+        } else {
+            /usr/bin/emacs $p1 $p2 $p3 $p4 &;
+        }
     }
 }
 
