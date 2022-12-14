@@ -1,4 +1,4 @@
-$env:path += ";" + (Get-Item "Env:ProgramFiles(x86)").Value + "\Git\bin" + ';E:\tools\grep\bin\';
+#$env:path += ";" + (Get-Item "Env:ProgramFiles(x86)").Value + "\Git\bin" + ';E:\tools\grep\bin\';
 $env:RIPGREP_CONFIG_PATH = "$($env:USERPROFILE)\.ripgreprc";
 
 if ($host.Name -eq 'ConsoleHost')
@@ -12,29 +12,26 @@ if ($host.Name -eq 'ConsoleHost')
 #    Import-Module posh-git;
 
     # Out-default wrapper.
-    Import-Module "$PSScriptRoot\Out-DefaultWrapper.ps1";
+    Import-Module "$PSScriptRoot/Out-DefaultWrapper.ps1";
 
     # Common Utilities
-    Import-Module "$PSScriptRoot\utilities.ps1";
+    Import-Module "$PSScriptRoot/utilities.ps1";
 
     # Common Functions (specific to personal)
-    Import-Module "$PSScriptRoot\Functions.ps1";
+    Import-Module "$PSScriptRoot/functions.ps1";
 
     # Filter Interactive
-    Import-Module "$PSScriptRoot\fi.psm1";
+    Import-Module "$PSScriptRoot/fi.psm1";
 }
 
-#if ($env:ConEmuPID)
-#{
-    Import-Module 'oh-my-posh' -MaximumVersion '2.1';
-    if (-not (Test-Path "$($ThemeSettings.MyThemesLocation)\Paradox2.psm1"))
-    {
-        mkdir $ThemeSettings.MyThemesLocation -ErrorAction SilentlyContinue;
-        copy "$($PSScriptRoot)\Paradox2.psm1" "$($ThemeSettings.MyThemesLocation)\Paradox2.psm1";
-    }
-    Set-Theme 'Paradox2';
-    $DefaultUser = $env:USERNAME;
-#}
+Import-Module 'oh-my-posh' -MaximumVersion '2.1';
+if (-not (Test-Path "$($ThemeSettings.MyThemesLocation)\Paradox2.psm1"))
+{
+    mkdir $ThemeSettings.MyThemesLocation -ErrorAction SilentlyContinue;
+    copy "$($PSScriptRoot)\Paradox2.psm1" "$($ThemeSettings.MyThemesLocation)\Paradox2.psm1";
+}
+Set-Theme 'Paradox2';
+$DefaultUser = $env:USERNAME;
 
 # Set Up alias
 

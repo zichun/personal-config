@@ -46,7 +46,9 @@
 ;(load-theme 'monokai t)
 (set-face-attribute 'default nil :height 125)
 (when window-system
-  (set-face-attribute 'default nil :font "Cascadia Code")
+  (if (eq system-type "windows-nt")
+      (set-face-attribute 'default nil :font "Cascadia Code")
+    (set-face-attribute 'default nil :font "Hack"))
   (setq-default line-spacing 3))
 
 ;;
@@ -234,7 +236,9 @@
           (t . ivy-posframe-display-at-frame-top-center))
         ivy-posframe-height-alist '((t . 20)))
   (setq ivy-posframe-border-width 10)
-  (setq ivy-posframe-parameters '((internal-border-width . 10) (font . "Cascadia Code")))
+  (if (eq system-type "windows-nt")
+      (setq ivy-posframe-parameters '((internal-border-width . 10) (font . "Cascadia Code")))
+    (setq ivy-posframe-parameters '((internal-border-width . 10) (font . "Hack"))))
   (setq ivy-posframe-width 700)
   (ivy-posframe-mode 1))
 
