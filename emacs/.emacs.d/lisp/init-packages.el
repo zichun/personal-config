@@ -14,6 +14,7 @@
 
 (defvar zichun/packages '(; misc / tools
                           use-package
+                          general
                           auto-complete
 ;                          autopair
                           gist
@@ -29,16 +30,24 @@
                           git-messenger
                           git-gutter
                           git-gutter-fringe
-                          ivy
                           swiper
-                          counsel
-                          counsel-gtags
                           prog-fill
                           shell-pop
                           golden-ratio
                           flycheck
                           anzu
                           deadgrep
+                          ivy
+                          counsel
+
+                          ; completion
+                          all-the-icons-completion
+                          consult
+                          consult-ls-git
+                          marginalia
+                          vertico
+                          hotfuzz
+                          orderless
 
                           ; modes
                           company

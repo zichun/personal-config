@@ -1,10 +1,36 @@
 {
+    "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
     "actions": 
     [
         {
+            "command": 
+            {
+                "action": "switchToTab",
+                "index": 7
+            },
+            "keys": "ctrl+8"
+        },
+        {
+            "command": 
+            {
+                "action": "newTab",
+                "index": 2
+            },
+            "keys": "alt+shift+3"
+        },
+        {
             "command": "unbound",
             "keys": "win+`"
+        },
+        {
+            "command": 
+            {
+                "action": "splitPane",
+                "split": "auto",
+                "splitMode": "duplicate"
+            },
+            "keys": "alt+shift+d"
         },
         {
             "command": 
@@ -25,11 +51,10 @@
         {
             "command": 
             {
-                "action": "splitPane",
-                "split": "auto",
-                "splitMode": "duplicate"
+                "action": "newTab",
+                "index": 1
             },
-            "keys": "alt+shift+d"
+            "keys": "alt+shift+2"
         },
         {
             "command": 
@@ -38,22 +63,6 @@
                 "index": 0
             },
             "keys": "alt+shift+1"
-        },
-        {
-            "command": 
-            {
-                "action": "newTab",
-                "index": 2
-            },
-            "keys": "alt+shift+3"
-        },
-        {
-            "command": 
-            {
-                "action": "newTab",
-                "index": 1
-            },
-            "keys": "alt+shift+2"
         },
         {
             "command": 
@@ -70,14 +79,6 @@
                 "index": 3
             },
             "keys": "ctrl+4"
-        },
-        {
-            "command": 
-            {
-                "action": "switchToTab",
-                "index": 7
-            },
-            "keys": "ctrl+8"
         },
         {
             "command": 
@@ -170,7 +171,6 @@
         "list": 
         [
             {
-                "commandline": "cmd.exe",
                 "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
                 "hidden": false,
                 "name": "Command Prompt"
@@ -182,13 +182,6 @@
                 "source": "Windows.Terminal.PowershellCore"
             },
             {
-                "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
-                "hidden": false,
-                "name": "Ubuntu",
-                "source": "Windows.Terminal.Wsl"
-            },
-            {
-                "commandline": "powershell.exe",
                 "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
                 "hidden": false,
                 "name": "Windows PowerShell"
@@ -755,5 +748,6 @@
             "white": "#FFFFFF",
             "yellow": "#E7C547"
         }
-    ]
+    ],
+    "themes": []
 }

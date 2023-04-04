@@ -51,32 +51,9 @@
     (set-face-attribute 'default nil :font "Hack"))
   (setq-default line-spacing 3))
 
-;;
-;; Ivy instead of Ido
-;;
-;; Ido-mode with flx and configuration
-;; (require 'ido-vertical-mode)
-;; (require 'flx-ido)
-;; (ido-mode 1)
-;; (ido-everywhere 1)
-;; (ido-vertical-mode 1)
-;; (flx-ido-mode 1)
-;; ;; disable ido faces to see flx highlights.
-;; (setq ido-enable-flex-matching t)
-;; (setq ido-use-faces nil)
-;; (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
-
-;; (use-package spaceline
-;;   :demand t
-;;   :init
-;;   (setq powerline-default-separator 'arrow-fade)
-;;   :config
-;;   (require 'spaceline-config)
-;;   (spaceline-spacemacs-theme))
-
 (use-package doom-modeline
   :ensure t
-  :init (doom-modeline-mode 1)
+  :hook (after-init . doom-modeline-mode)
 
   :config
   ;; How tall the mode-line should be (only respected in GUI Emacs).
@@ -192,62 +169,62 @@
   :config
   (save-place-mode 1))
 
-(use-package ivy
-  :diminish
-  :bind (("C-s" . swiper)
-         :map ivy-minibuffer-map
-         ("TAB" . ivy-alt-done)
-         ("C-f" . ivy-alt-done)
-         ("C-l" . ivy-alt-done)
-         ("C-j" . ivy-next-line)
-         ("C-k" . ivy-previous-line)
-         :map ivy-switch-buffer-map
-         ("C-k" . ivy-previous-line)
-         ("C-l" . ivy-done)
-         ("C-d" . ivy-switch-buffer-kill)
-         :map ivy-reverse-i-search-map
-         ("C-k" . ivy-previous-line)
-         ("C-d" . ivy-reverse-i-search-kill))
-  :init
-  (ivy-mode 1)
-  :config
-  (setq ivy-use-virtual-buffers t)
-  (setq ivy-wrap t)
-  (setq ivy-count-format "(%d/%d) ")
-  (setq enable-recursive-minibuffers t)
-
- (setq ivy-dynamic-exhibit-delay-ms 250)
- (setq ivy-use-virtual-buffers t)
- (setq ivy-count-format "(%d/%d) ")
- (setq ivy-re-builders-alist
-       '((swiper . ivy--regex-plus)
-         (t      . ivy--regex-fuzzy))))
-
-(use-package ivy-posframe
-;  :disabled
-  :after ivy
-  :diminish
-  :config
-  (set-face-attribute 'ivy-posframe nil :background "gray11")
-  (set-face-attribute 'ivy-posframe-border nil :background "gray11")
-  (setq ivy-posframe-display-functions-alist
-        '((swiper          . ivy-display-function-fallback)
-          (complete-symbol . ivy-posframe-display-at-point)
-          (t . ivy-posframe-display-at-frame-top-center))
-        ivy-posframe-height-alist '((t . 20)))
-  (setq ivy-posframe-border-width 10)
-  (if (string-equal system-type "windows-nt")
-      (setq ivy-posframe-parameters '((internal-border-width . 10) (font . "Cascadia Code")))
-    (setq ivy-posframe-parameters '((internal-border-width . 10) (font . "Hack"))))
-  (setq ivy-posframe-width 700)
-  (ivy-posframe-mode 1))
-
 (use-package which-key
   :ensure
   :init (which-key-mode)
   :diminish which-key-mode
   :config
   (setq which-key-idle-delay 0.3))
+
+;; (use-package ivy
+;;   :diminish
+;;   :bind (("C-s" . swiper)
+;;          :map ivy-minibuffer-map
+;;          ("TAB" . ivy-alt-done)
+;;          ("C-f" . ivy-alt-done)
+;;          ("C-l" . ivy-alt-done)
+;;          ("C-j" . ivy-next-line)
+;;          ("C-k" . ivy-previous-line)
+;;          :map ivy-switch-buffer-map
+;;          ("C-k" . ivy-previous-line)
+;;          ("C-l" . ivy-done)
+;;          ("C-d" . ivy-switch-buffer-kill)
+;;          :map ivy-reverse-i-search-map
+;;          ("C-k" . ivy-previous-line)
+;;          ("C-d" . ivy-reverse-i-search-kill))
+;;   :init
+;;   (ivy-mode 1)
+;;   :config
+;;   (setq ivy-use-virtual-buffers t)
+;;   (setq ivy-wrap t)
+;;   (setq ivy-count-format "(%d/%d) ")
+;;   (setq enable-recursive-minibuffers t)
+
+;;  (setq ivy-dynamic-exhibit-delay-ms 250)
+;;  (setq ivy-use-virtual-buffers t)
+;;  (setq ivy-count-format "(%d/%d) ")
+;;  (setq ivy-re-builders-alist
+;;        '((swiper . ivy--regex-plus)
+;;          (t      . ivy--regex-fuzzy))))
+
+;; (use-package ivy-posframe
+;; ;  :disabled
+;;   :after ivy
+;;   :diminish
+;;   :config
+;;   (set-face-attribute 'ivy-posframe nil :background "gray11")
+;;   (set-face-attribute 'ivy-posframe-border nil :background "gray11")
+;;   (setq ivy-posframe-display-functions-alist
+;;         '((swiper          . ivy-display-function-fallback)
+;;           (complete-symbol . ivy-posframe-display-at-point)
+;;           (t . ivy-posframe-display-at-frame-top-center))
+;;         ivy-posframe-height-alist '((t . 20)))
+;;   (setq ivy-posframe-border-width 10)
+;;   (if (string-equal system-type "windows-nt")
+;;       (setq ivy-posframe-parameters '((internal-border-width . 10) (font . "Cascadia Code")))
+;;     (setq ivy-posframe-parameters '((internal-border-width . 10) (font . "Hack"))))
+;;   (setq ivy-posframe-width 700)
+;;   (ivy-posframe-mode 1))
 
 ;; (use-package ivy-rich
 ;;   :preface

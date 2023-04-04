@@ -51,21 +51,19 @@
 ;; Ivy-based replacement for standard commands
 ; (global-set-key (kbd "C-s") 'swiper)
 ; (global-set-key (kbd "C-r") 'swiper)
-(global-set-key (kbd "M-x") 'counsel-M-x)
-(global-set-key (kbd "C-x C-f") 'counsel-find-file)
+;(global-set-key (kbd "M-x") 'counsel-M-x)
+; (global-set-key (kbd "C-x C-f") 'counsel-find-file)
 ;; Ivy-based interface to shell and system tools
-(global-set-key (kbd "C-c g") 'counsel-git)
+; (global-set-key (kbd "C-c g") 'counsel-git)
 ;; Other commands
-(global-set-key (kbd "C-c C-r") 'ivy-resume)
-(global-set-key (kbd "C-x C-i") 'counsel-imenu)
-
-(global-set-key (kbd "C-c f") #'deadgrep)
+;(global-set-key (kbd "C-c C-r") 'ivy-resume)
+;(global-set-key (kbd "C-x C-i") 'counsel-imenu)
+;(global-set-key (kbd "C-c f") #'deadgrep)
 
 ;; Swiper
-(global-set-key (kbd "C-s") 'swiper)
-(global-set-key (kbd "C-r") 'swiper-backward)
-(define-key ivy-minibuffer-map (kbd "C-s") 'ivy-next-line-or-history)
-(define-key ivy-minibuffer-map (kbd "C-r") 'ivy-previous-line-or-history)
-
+;(global-set-key (kbd "C-s") 'swiper)
+;(global-set-key (kbd "C-r") 'swiper-backward)
+;; (define-key ivy-minibuffer-map (kbd "C-s") 'ivy-next-line-or-history)
+;; (define-key ivy-minibuffer-map (kbd "C-r") 'ivy-previous-line-or-history)
 
 (provide 'init-keybindings)

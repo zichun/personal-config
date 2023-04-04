@@ -16,6 +16,7 @@
 
 (require 'init-packages)
 (require 'init-ui)
+(require 'init-completion)
 (require 'init-utils)
 (require 'init-tools)
 (require 'init-org)
