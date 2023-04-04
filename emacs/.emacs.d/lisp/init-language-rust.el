@@ -34,6 +34,9 @@
   (lsp-eldoc-render-all t)
   (lsp-idle-delay 0.6)
   (lsp-enable-file-watchers 'nil)
+  ;; (lsp-prefer-capf t)
+  ;; (lsp-completion-provider :capf)
+  ;; (lsp-completion-enable t)
   :config
   (add-hook 'lsp-mode-hook 'lsp-ui-mode))
 
@@ -50,21 +53,6 @@
          ("C-?" . eldoc-doc-buffer)
          )
   )
-
-(use-package company
-  :hook (prog-mode . company-mode)
-  :config
-  (setq company-tooltip-align-annotations t)
-  (setq company-minimum-prefix-length 1)
-  :custom
-  (company-idle-delay 0.3) ;; how long to wait until popup
-  ;; (company-begin-commands nil) ;; uncomment to disable popup
-  :bind
-  (:map company-active-map
-	    ("C-n". company-select-next)
-	    ("C-p". company-select-previous)
-	    ("M-<". company-select-first)
-	    ("M->". company-select-last)))
 
 (use-package yasnippet
   :ensure

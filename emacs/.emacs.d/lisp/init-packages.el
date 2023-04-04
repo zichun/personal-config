@@ -48,6 +48,8 @@
                           vertico
                           hotfuzz
                           orderless
+                          corfu
+                          kind-icon
 
                           ; modes
                           company
