@@ -131,10 +131,14 @@
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :bind (;; C-c bindings (mode-specific-map)
          ("C-x b" . consult-buffer)
-         ("C-s" . consult-line)
+;         ("C-s" . consult-line) ;; let's use swiper instead
          ("C-c g" . consult-git-grep)
          ("C-c f" . consult-ripgrep)
          ("C-x C-i" . consult-imenu)))
+
+(use-package swiper
+  :bind (("C-s" . swiper)
+         ("C-r" . swiper-backward)))
 
 (use-package consult-ls-git
   :ensure t
