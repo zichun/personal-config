@@ -32,6 +32,7 @@
   (rustic-lsp-server 'rust-analyzer)
   (lsp-rust-analyzer-server-display-inlay-hints 't)
   (lsp-eldoc-render-all t)
+  (lsp-rust-analyzer-display-parameter-hints t)
   (lsp-idle-delay 0.6)
   (lsp-enable-file-watchers 'nil)
   ;; (lsp-prefer-capf t)
