@@ -193,7 +193,7 @@ public class WinAp {
         if (Get-Process emacs -ErrorAction 'SilentlyContinue') {
             emacsclient -n --no-wait $p1 $p2 $p3 $p4;
         } else {
-            /usr/bin/emacs $p1 $p2 $p3 $p4 &;
+            & '/usr/bin/emacs $p1 $p2 $p3 $p4 &';
         }
     }
 }
