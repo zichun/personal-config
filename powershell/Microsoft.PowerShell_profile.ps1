@@ -137,11 +137,6 @@ if ($env:OS -eq 'Windows_NT') {
     $DefaultUser = $env:USER;
 }
 
-#function prompt {
-#    Initialize-Profile;
-#}
-
-
 $LazyLoadProfileRunspace = [RunspaceFactory]::CreateRunspace()
 $LazyLoadProfile = [PowerShell]::Create()
 $LazyLoadProfile.Runspace = $LazyLoadProfileRunspace
