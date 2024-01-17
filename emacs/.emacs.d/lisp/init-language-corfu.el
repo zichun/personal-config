@@ -20,7 +20,7 @@
   (tab-always-indent 'complete)
   (completion-cycle-threshold nil)      ; Always show candidates in menu
 
-  (corfu-auto t)
+  (corfu-auto nil)
   (corfu-auto-prefix 2)
   (corfu-auto-delay 0.25)
 

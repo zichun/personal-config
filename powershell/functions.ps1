@@ -363,10 +363,6 @@ function Invoke-Environment
     }
 }
 
-$rename = Get-Command RenameTab -erroraction 'ignore';
-if (-not $rename)
-{
-    function RenameTab($name) {
-        $host.ui.rawui.WindowTitle = $name;
-    }
+function RenameTab($name) {
+    $host.ui.rawui.WindowTitle = $name;
 }

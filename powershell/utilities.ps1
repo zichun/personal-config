@@ -970,3 +970,13 @@ function Out-Tree {
         };
     }
 }
+
+function Test-IsAdmin {
+    if ($env:OS -eq 'Windows_NT') {
+        $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent();
+        $principal = new-object Security.Principal.WindowsPrincipal($currentUser);
+        $principal.IsInRole("Administrators");
+    } else {
+        return $env:USER -eq 'root';
+    }
+}

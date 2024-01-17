@@ -1,134 +1,70 @@
-#$env:path += ";" + (Get-Item "Env:ProgramFiles(x86)").Value + "\Git\bin" + ';E:\tools\grep\bin\';
 $env:RIPGREP_CONFIG_PATH = "$($env:USERPROFILE)\.ripgreprc";
+$Script:ProfileInitialized = $false;
 
-if ($host.Name -eq 'ConsoleHost')
-{
-    # PSReadline
-#    Import-Module PSReadline
-    Set-PSReadlineOption -EditMode Emacs;
-
-    # Posh-git
-#    . 'C:\Users\kohzi\Documents\WindowsPowerShell\Modules\posh-git\profile.example.ps1';
-#    Import-Module posh-git;
-
-    # Out-default wrapper.
-    Import-Module "$PSScriptRoot/Out-DefaultWrapper.ps1";
-
-    # Common Utilities
-    Import-Module "$PSScriptRoot/utilities.ps1";
-
-    # Common Functions (specific to personal)
-    Import-Module "$PSScriptRoot/functions.ps1";
-
-    # Filter Interactive
-    Import-Module "$PSScriptRoot/fi.psm1";
+function Initialize-Profile {
+    if (-not $Script:ProfileInitialized) {
+        $Script:ProfileInitialized = $true;
+        Import-Scripts;
+        Initialize-OhMyPosh;
+        Initialize-Aliases;
+        Import-CustomScripts;
+    }
 }
 
-Import-Module 'oh-my-posh' -MaximumVersion '2.1';
-if (-not (Test-Path "$($ThemeSettings.MyThemesLocation)\Paradox2.psm1")) {
-    if (-not (Test-Path $ThemeSettings.MyThemesLocation)) {
-        if ($env:OS -eq 'Windows_NT') {
-            mkdir $ThemeSettings.MyThemesLocation;
-        } else {
-            $path = $ThemeSettings.MyThemesLocation -replace '\\','/';
-            $path = $path -replace '~',$env:HOME;
-            mkdir -p $path;
+function Import-Scripts {
+    if ($host.Name -eq 'ConsoleHost')
+    {
+        Set-PSReadlineOption -EditMode Emacs;
+
+        # Out-default wrapper.
+        . "$PSScriptRoot/Out-DefaultWrapper.ps1";
+
+        # Common Utilities
+        . "$PSScriptRoot/utilities.ps1";
+
+        # Common Functions (specific to personal)
+        . "$PSScriptRoot/functions.ps1";
+
+        # Filter Interactive
+        Import-Module "$PSScriptRoot/fi.psm1";
+    }
+}
+
+function Initialize-OhMyPosh {
+    Import-Module 'oh-my-posh' -MaximumVersion '2.1';
+    if (-not (Test-Path "$($ThemeSettings.MyThemesLocation)\Paradox2.psm1")) {
+        if (-not (Test-Path $ThemeSettings.MyThemesLocation)) {
+            if ($env:OS -eq 'Windows_NT') {
+                mkdir $ThemeSettings.MyThemesLocation;
+            } else {
+                $path = $ThemeSettings.MyThemesLocation -replace '\\','/';
+                $path = $path -replace '~',$env:HOME;
+                mkdir -p $path;
+            }
+        }
+        copy "$($PSScriptRoot)\Paradox2.psm1" "$($ThemeSettings.MyThemesLocation)\Paradox2.psm1";
+    }
+    Set-Theme 'Paradox2';
+}
+
+function Initialize-Aliases {
+    Set-Alias dirs Find-File;
+    Set-Alias grep Find-String;
+    Set-Alias highlight Write-HighlightString;
+    Set-Alias hi Write-HighlightString;
+    Set-Alias glr Get-LastResult;
+    Set-Alias glc Get-LastCommand;
+    Set-Alias sin Select-Interactive;
+}
+
+function Import-CustomScripts {
+    if (Test-Path "$($env:USERPROFILE)\Documents\WindowsPowerShell\custom.ps1")
+    {
+        if ($host.Name -eq 'ConsoleHost')
+        {
+            . "$($env:USERPROFILE)\Documents\WindowsPowerShell\custom.ps1";
         }
     }
-    copy "$($PSScriptRoot)\Paradox2.psm1" "$($ThemeSettings.MyThemesLocation)\Paradox2.psm1";
-}
-Set-Theme 'Paradox2';
-
-if ($env:OS -eq 'Windows_NT') {
-    $DefaultUser = $env:USERNAME;
-} else {
-    $DefaultUser = $env:USER;
-}
-
-# Set Up alias
-
-Set-Alias dirs Find-File;
-Set-Alias grep Find-String;
-Set-Alias highlight Write-HighlightString;
-Set-Alias hi Write-HighlightString;
-Set-Alias glr Get-LastResult;
-Set-Alias glc Get-LastCommand;
-Set-Alias sin Select-Interactive;
-
-# Set-up Prompt
-
-# function global:prompt {
-
-#     $realLastExitCode = $LastExitCode
-
-#     if (Get-Module Posh-Git) {
-
-#         Write-Host $pwd.ProviderPath -NoNewLine;
-#         Write-VcsStatus;
-#         Write-Host;
-
-#     } else {
-
-#         $Host.UI.RawUI.ForegroundColor = 'Cyan';
-#         Write-Host $pwd.ProviderPath;;
-
-#     }
-
-#     if ($global:IsCurrentUserAdministrator) {
-
-#         $Host.UI.RawUI.ForegroundColor = 'Red';
-#         Write-Host '***Administrator*** $' -NoNewLine;
-
-#     } else {
-
-#         $Host.UI.RawUI.ForegroundColor = 'Yellow';
-#         Write-Host '>' -NoNewline;
-
-#     }
-
-#     $Global:LastExitCode = $realLastExitCode;
-
-#     $out = ' ';
-
-#     # Check for ConEmu existance and ANSI emulation enabled
-#     if ($env:ConEmuANSI -eq "ON") {
-#         # Let ConEmu know when the prompt ends, to select typed
-#         # command properly with "Shift+Home", to change cursor
-#         # position in the prompt by simple mouse click, etc.
-
-#         $out += "$([char]27)]9;12$([char]7)";
-
-#         # And current working directory (FileSystem)
-#         # ConEmu may show full path or just current folder name
-#         # in the Tab label (check Tab templates)
-#         # Also this knowledge is crucial to process hyperlinks clicks
-#         # on files in the output from compilers and source control
-#         # systems (git, hg, ...)
-#         if ($pwd.Provider.Name -eq "FileSystem") {
-#             $out += "$([char]27)]9;9;`"$($pwd.Path)`"$([char]7)";
-#         }
-#         return $out;
-#     }
-
-#     return $out;
-# }
-
-function Test-IsAdmin {
-    if ($env:OS -eq 'Windows_NT') {
-        $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent();
-        $principal = new-object Security.Principal.WindowsPrincipal($currentUser);
-        $principal.IsInRole("Administrators");
-    } else {
-        return $env:USER -eq 'root';
-    }
-}
-
-$Global:IsCurrentUserAdministrator = Test-IsAdmin
-
-# Chocolatey profile
-$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-if (Test-Path($ChocolateyProfile)) {
-    Import-Module "$ChocolateyProfile";
 }
 
 function em {
@@ -181,9 +117,6 @@ public class WinAp {
 "@
             $h = $emacs.MainWindowHandle;
             [void] [WinAp]::SetForegroundWindow($h);
-
-            #        [void] [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.VisualBasic");
-            #        [Microsoft.VisualBasic.Interaction]::AppActivate($emacs.Id);
         }
         else
         {
@@ -198,37 +131,28 @@ public class WinAp {
     }
 }
 
-if (Test-Path "$($env:USERPROFILE)\Documents\WindowsPowerShell\custom.ps1")
-{
-    if ($host.Name -eq 'ConsoleHost')
-    {
-        . "$($env:USERPROFILE)\Documents\WindowsPowerShell\custom.ps1";
-    }
+if ($env:OS -eq 'Windows_NT') {
+    $DefaultUser = $env:USERNAME;
+} else {
+    $DefaultUser = $env:USER;
 }
 
-Set-PSReadLineKeyHandler -Chord Shift+Spacebar -Function SelfInsert
+#function prompt {
+#    Initialize-Profile;
+#}
 
-# PSCore hacks
-if ($PSVersionTable.PSVersion.Major -eq 6)
-{
-    Import-Module ClipboardText;
 
-    function Set-Clipboard {
-        [CmdletBinding()]
-        param(
-            [Parameter(Position=0,
-                       Mandatory=$true,
-                       ValueFromPipeline=$true,
-                       ValueFromPipelineByPropertyName=$true)]
-            [Object]
-            $Value
-        )
-
-        $Value | Set-ClipboardText;
-    }
-
-    function Get-Clipboard
-    {
-        Get-ClipboardText;
-    }
+$LazyLoadProfileRunspace = [RunspaceFactory]::CreateRunspace()
+$LazyLoadProfile = [PowerShell]::Create()
+$LazyLoadProfile.Runspace = $LazyLoadProfileRunspace
+$LazyLoadProfileRunspace.Open()
+[void]$LazyLoadProfile.AddScript({Initialize-Profile}) # (1)
+[void]$LazyLoadProfile.BeginInvoke()
+$null = Register-ObjectEvent -InputObject $LazyLoadProfile -EventName InvocationStateChanged -Action {
+    Initialize-Profile
+    $global:GitPromptSettings.DefaultPromptPrefix.Text = 'PS '
+    $global:GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`n'
+    $LazyLoadProfile.Dispose()
+    $LazyLoadProfileRunspace.Close()
+    $LazyLoadProfileRunspace.Dispose()
 }
