@@ -58,11 +58,15 @@ function Initialize-Aliases {
 }
 
 function Import-CustomScripts {
-    if (Test-Path "$($env:USERPROFILE)\Documents\WindowsPowerShell\custom.ps1")
+    if ($host.Name -eq 'ConsoleHost')
     {
-        if ($host.Name -eq 'ConsoleHost')
+        if (Test-Path "$($env:USERPROFILE)\Documents\WindowsPowerShell\custom.ps1")
         {
             . "$($env:USERPROFILE)\Documents\WindowsPowerShell\custom.ps1";
+        }
+        elseif (Test-Path "$PSScriptRoot\custom.ps1")
+        {
+            . "$PSScriptRoot\custom.ps1";
         }
     }
 }
