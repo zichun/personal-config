@@ -4,10 +4,10 @@ $Script:ProfileInitialized = $false;
 function Initialize-Profile {
     if (-not $Script:ProfileInitialized) {
         $Script:ProfileInitialized = $true;
-        Import-Scripts;
+        . Import-Scripts;
         Initialize-OhMyPosh;
-        Initialize-Aliases;
-        Import-CustomScripts;
+        . Initialize-Aliases;
+        . Import-CustomScripts;
     }
 }
 
@@ -123,31 +123,32 @@ public class WinAp {
             emacsclientw.exe -n --no-wait --alternate-editor="runemacs.exe" -e '';
         }
     } else {
-        if (Get-Process emacs -ErrorAction 'SilentlyContinue') {
-            emacsclient -n --no-wait $p1 $p2 $p3 $p4;
-        } else {
-            & '/usr/bin/emacs $p1 $p2 $p3 $p4 &';
-        }
+        & '/usr/bin/emacs' $p1 $p2 $p3 $p4;
+    }
+}
+
+function Invoke-LazyLoad {
+    $LazyLoadProfileRunspace = [RunspaceFactory]::CreateRunspace()
+    $LazyLoadProfile = [PowerShell]::Create()
+    $LazyLoadProfile.Runspace = $LazyLoadProfileRunspace
+    $LazyLoadProfileRunspace.Open()
+    [void]$LazyLoadProfile.AddScript({. Initialize-Profile;}) # (1)
+    [void]$LazyLoadProfile.BeginInvoke()
+    $null = Register-ObjectEvent -InputObject $LazyLoadProfile -EventName InvocationStateChanged -Action {
+        . Initialize-Profile;
+        $global:GitPromptSettings.DefaultPromptPrefix.Text = 'PS '
+        $global:GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`n'
+        $LazyLoadProfile.Dispose()
+        $LazyLoadProfileRunspace.Close()
+        $LazyLoadProfileRunspace.Dispose()
     }
 }
 
 if ($env:OS -eq 'Windows_NT') {
     $DefaultUser = $env:USERNAME;
+    . Invoke-LazyLoad;
 } else {
     $DefaultUser = $env:USER;
+    . Initialize-Profile;
 }
 
-$LazyLoadProfileRunspace = [RunspaceFactory]::CreateRunspace()
-$LazyLoadProfile = [PowerShell]::Create()
-$LazyLoadProfile.Runspace = $LazyLoadProfileRunspace
-$LazyLoadProfileRunspace.Open()
-[void]$LazyLoadProfile.AddScript({Initialize-Profile}) # (1)
-[void]$LazyLoadProfile.BeginInvoke()
-$null = Register-ObjectEvent -InputObject $LazyLoadProfile -EventName InvocationStateChanged -Action {
-    Initialize-Profile
-    $global:GitPromptSettings.DefaultPromptPrefix.Text = 'PS '
-    $global:GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`n'
-    $LazyLoadProfile.Dispose()
-    $LazyLoadProfileRunspace.Close()
-    $LazyLoadProfileRunspace.Dispose()
-}
