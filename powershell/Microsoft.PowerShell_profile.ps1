@@ -2,13 +2,23 @@ $env:RIPGREP_CONFIG_PATH = "$($env:USERPROFILE)\.ripgreprc";
 $Script:ProfileInitialized = $false;
 
 function Initialize-Profile {
-    if (-not $Script:ProfileInitialized) {
-        $Script:ProfileInitialized = $true;
-        . Import-Scripts;
-        Initialize-OhMyPosh;
-        . Initialize-Aliases;
-        . Import-CustomScripts;
+    Param(
+        [Switch]$Force
+    )
+    PROCESS
+    {
+        if (-not $Script:ProfileInitialized -or $Force) {
+            $Script:ProfileInitialized = $true;
+            . Import-Scripts;
+            Initialize-OhMyPosh;
+            . Initialize-Aliases;
+            . Import-CustomScripts;
+        }
     }
+}
+
+function init {
+    Initialize-Profile -Force;
 }
 
 function Import-Scripts {
@@ -136,10 +146,10 @@ function Invoke-LazyLoad {
     $LazyLoadProfile = [PowerShell]::Create()
     $LazyLoadProfile.Runspace = $LazyLoadProfileRunspace
     $LazyLoadProfileRunspace.Open()
-    [void]$LazyLoadProfile.AddScript({. Initialize-Profile;}) # (1)
+    [void]$LazyLoadProfile.AddScript({. Initialize-Profile -Force;}) # (1)
     [void]$LazyLoadProfile.BeginInvoke()
     $null = Register-ObjectEvent -InputObject $LazyLoadProfile -EventName InvocationStateChanged -Action {
-        . Initialize-Profile;
+        . Initialize-Profile -Force;
         $global:GitPromptSettings.DefaultPromptPrefix.Text = 'PS '
         $global:GitPromptSettings.DefaultPromptBeforeSuffix.Text = '`n'
         $LazyLoadProfile.Dispose()
@@ -155,4 +165,3 @@ if ($env:OS -eq 'Windows_NT') {
     $DefaultUser = $env:USER;
     . Initialize-Profile;
 }
-
