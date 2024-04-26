@@ -62,7 +62,13 @@
               (ggtags-mode 0)
               (flycheck-mode 0))))
 
-
+(use-package treesit-auto
+  :custom
+  (treesit-auto-install 'prompt)
+  :config
+  (treesit-auto-add-to-auto-mode-alist '(rust toml c++))
+  (setq rust-ts-mode-hook rust-mode-hook)
+  (global-treesit-auto-mode))
 
 ;; (use-package company
 ;;   :hook (prog-mode . company-mode)
@@ -83,7 +89,8 @@
 (require 'init-language-corfu)
 
                                         ;(require 'ra-emacs-lsp)
-(require 'init-language-rust)
+;(require 'init-language-rust)
+(require 'init-language-rust-ts)
 (require 'init-language-web)
 (require 'init-language-cpp)
 

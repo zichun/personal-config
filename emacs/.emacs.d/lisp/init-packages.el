@@ -75,6 +75,7 @@
                           tide
                           yasnippet
                           flycheck-rust
+			  treesit-auto
 
                           ; UI
                           spaceline

@@ -1,6 +1,17 @@
 (remove-hook 'c++-mode-hook 'flycheck-mode)
 (provide 'init-language-cpp)
 
+
+(use-package c-ts-mode
+  :if (treesit-language-available-p 'c)
+  :custom
+  (c-ts-mode-indent-offset 4)
+  :init
+  ;; Remap the standard C/C++ modes
+  (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(c-or-c++-mode . c-or-c++-ts-mode)))
+
 ;; (require 'lsp-mode)
 ;; ;; (require 's)
 ;; ;; (require 'f)
