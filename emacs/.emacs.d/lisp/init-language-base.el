@@ -67,7 +67,6 @@
   (treesit-auto-install 'prompt)
   :config
   (treesit-auto-add-to-auto-mode-alist '(rust toml c++))
-  (setq rust-ts-mode-hook rust-mode-hook)
   (global-treesit-auto-mode))
 
 ;; (use-package company
