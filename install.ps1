@@ -1,20 +1,22 @@
 Set-ExecutionPolicy Bypass -Force;
 
-Install-Choco;
-Install-WinGet;
+function Invoke-Install {
+    Install-Choco;
+    Install-WinGet;
 
-cd $env:USERPROFILE;
-& "$($env:ProgramFiles)\Git\cmd\git" clone https://github.com/zichun/personal-config.git;
+    cd $env:USERPROFILE;
+    & "$($env:ProgramFiles)\Git\cmd\git" clone https://github.com/zichun/personal-config.git;
 
-# Show Networking connectivity on standby option in "Edit Power Plan"
-REG ADD HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\F15576E8-98B7-4186-B944-EAFA664402D9 /v Attributes /t REG_DWORD /d 2 /f
+    # Show Networking connectivity on standby option in "Edit Power Plan"
+    REG ADD HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\F15576E8-98B7-4186-B944-EAFA664402D9 /v Attributes /t REG_DWORD /d 2 /f
 
-Install-Fonts;
-Install-Packages;
-Install-Emacs;
-Install-Pwsh;
-Install-Rust;
-Install-Ripgrep;
+    Install-Fonts;
+    Install-Packages;
+    Install-Emacs;
+    Install-Pwsh;
+    Install-Rust;
+    Install-Ripgrep;
+}
 
 function Install-Choco {
     iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'));
@@ -62,6 +64,8 @@ function Install-Packages {
     winget install LLVM.LLVM;
     winget install --id=Microsoft.VisualStudio.2022.BuildTools -e;
 
+    choco install mingw -y;
+
     npm install -g mermaid.cli;
 }
 
@@ -92,7 +96,7 @@ function Install-Rust {
     rustup update
     rustup component add clippy --toolchain stable-x86_64-pc-windows-msvc
     rustup component add rls rust-analysis rust-src;
-    cargo install rust-script
+    cargo install rust-script;
     choco install rust-analyzer -y;
 }
 
@@ -171,3 +175,4 @@ function Install-CascadiaCode {
     Remove-Item cascadiacode -Recurse -Force;
 }
 
+Invoke-Install;
