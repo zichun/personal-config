@@ -66,7 +66,6 @@
                           rustic
                           lsp-mode
                           lsp-ui
-                          csharp-mode
                           fsharp-mode
                           markdown-mode
                           yaml-mode
@@ -75,7 +74,7 @@
                           tide
                           yasnippet
                           flycheck-rust
-			  treesit-auto
+			              treesit-auto
 
                           ; UI
                           spaceline
