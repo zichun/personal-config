@@ -25,7 +25,7 @@
   :defer t
   :hook (org-mode . zc/org-mode-setup)
   :config
-  (setq org-directory "~/OneDrive/org")
+  (setq org-directory "~/Sync/org")
   (setq org-default-notes-file (concat org-directory "/journal.org"))
   (setq org-default-journal-file (concat org-directory "/journal.org"))
   (setq org-default-todo-file (concat org-directory "/todo.org"))
@@ -155,7 +155,7 @@
 
 (defun org-babel-execute:mermaid (body params)
   (let* ((out-file
-          (or (expand-file-name (concat "~/OneDrive/org/"
+          (or (expand-file-name (concat "~/Sync/org/"
                                         (cdr (assoc :file params))))
               (error "mermaid requires a \":file\" header argument")))
 	 (theme (cdr (assoc :theme params)))
