@@ -53,16 +53,22 @@
 
 ;; shell-pop
 
-(use-package shell-pop
-  :bind (("C-t" . shell-pop))
-  :config
-  (setq explicit-shell-file-name "C:/Program Files/PowerShell/7/pwsh.exe")
-  (setq shell-pop-window-position "bottom")
-  (setq shell-pop-full-span t)
-  (setq shell-pop-window-size 30)
-  (setq shell-file-name "powershell")
-  (setq explicit-pwsh.exe-args '("-noprofile")))
-
+(if window-system
+  (use-package shell-pop
+    :bind (("C-t" . shell-pop))
+    :config
+    (setq explicit-shell-file-name "C:/Program Files/PowerShell/7/pwsh.exe")
+    (setq shell-pop-window-position "bottom")
+    (setq shell-pop-full-span t)
+    (setq shell-pop-window-size 30)
+    (setq shell-file-name "powershell")
+    (setq explicit-pwsh.exe-args '("-noprofile")))
+  (use-package shell-pop
+    :bind (("C-t" . shell-pop))
+    :config
+    (setq shell-pop-window-position "bottom")
+    (setq shell-pop-full-span t)
+    (setq shell-pop-window-size 30)))
 
 (add-hook 'shell-mode-hook (lambda ()
                              (setq show-trailing-whitespace nil)))

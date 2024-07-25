@@ -63,6 +63,7 @@ function Install-Packages {
     winget install Microsoft.VisualStudio.2022.Community;
     winget install LLVM.LLVM;
     winget install --id=Microsoft.VisualStudio.2022.BuildTools -e;
+    winget install SyncTrayzor;
 
     choco install mingw -y;
 
