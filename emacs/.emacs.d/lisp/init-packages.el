@@ -94,6 +94,7 @@
                           flatland-theme
                           badwolf-theme
                           vscode-dark-plus-theme
+                          adwaita-dark-theme
 
                           ; org
                           org-superstar
