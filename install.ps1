@@ -98,6 +98,7 @@ function Install-Rust {
     rustup component add clippy --toolchain stable-x86_64-pc-windows-msvc
     rustup component add rls rust-analysis rust-src;
     cargo install rust-script;
+    cargo install emacs-lsp-booster;
     choco install rust-analyzer -y;
 }
 

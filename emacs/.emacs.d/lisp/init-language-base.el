@@ -92,5 +92,6 @@
 (require 'init-language-rust-ts)
 (require 'init-language-web)
 (require 'init-language-cpp)
+(require 'init-language-copilot)
 
 (provide 'init-language-base)
