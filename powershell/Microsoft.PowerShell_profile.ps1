@@ -160,7 +160,8 @@ function Invoke-LazyLoad {
 
 if ($env:OS -eq 'Windows_NT') {
     $DefaultUser = $env:USERNAME;
-    . Invoke-LazyLoad;
+#    . Invoke-LazyLoad;
+    . Initialize-Profile;
 } else {
     $DefaultUser = $env:USER;
     . Initialize-Profile;

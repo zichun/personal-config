@@ -32,7 +32,7 @@
   (setq org-default-personal-file (concat org-directory "/personal.org"))
   (setq org-catch-invisible-edits 'show-and-error)
 
-  (setq org-agenda-files '(org-default-journal-file))
+  (setq org-agenda-files (list (symbol-value 'org-default-journal-file)))
 
   (setq org-capture-templates
         '(    ;; ... other templates

@@ -4,8 +4,8 @@ param
     [switch] $Install
 )
 
-$script:ErrorActionPreference = "Stop"
-Set-StrictMode -Version Latest
+# $script:ErrorActionPreference = "Stop"
+# Set-StrictMode -Version Latest;
 function PSScriptRoot { $MyInvocation.ScriptName | Split-Path }
 
 trap { throw $Error[0] }
