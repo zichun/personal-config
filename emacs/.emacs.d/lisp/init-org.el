@@ -1,5 +1,6 @@
 (require 'org)
 (require 'org-tempo)
+(require 'csv)
 
 (defun zc/org-mode-setup ()
   (org-indent-mode)
@@ -51,7 +52,18 @@
            (file+datetree org-default-personal-file)
            "* %?"
            :empty-lines 1)
-          ))
+
+          ;; New Incident template
+        ("i" "Incident"
+         entry
+         (file+datetree (lambda ()
+                 (let ((incident-number (read-string "Incident number: ")))
+                   (setq org-capture-incident-number incident-number) ; store temporarily
+                   (expand-file-name (format "icm/%s.org" incident-number) org-directory))))
+         "* Incident [[https://portal.microsofticm.com/imp/v5/incidents/details/%(identity org-capture-incident-number)/summary][%(identity org-capture-incident-number)]]\n\n%?\n"
+         :empty-lines 1)
+
+        ))
 
   ;; Enable inline highlighting for codeblocks
   (setq org-src-fontify-natively t)
@@ -136,18 +148,25 @@
   "Default arguments for evaluatiing a kusto source block.")
 
 (defun org-babel-execute:kusto (body params)
-  (let* ((temp-file (org-babel-temp-file "org-"))
-         (cmd (concat "powershell -noprofile -noninteractive "
-                      "C:/repos/scripts/invoke-kusto.ps1"
-                      " -QueryFile " temp-file)))
-    (with-temp-file temp-file (insert body))
-    (message "%s" cmd)
-    (org-babel-eval cmd "")
-    (message "temp-file: %s" temp-file)
-    (with-temp-buffer
-      (insert-file-contents temp-file)
-      (buffer-string))
-  ))
+  (let* ((temp-file (org-babel-temp-file "org-kusto-" ".kql"))
+         (command (concat "powershell -noprofile -noninteractive "
+                      "C:/repos/scripts/kusto/invoke-kusto.ps1"
+                      " -OrgFormat -QueryFile " temp-file))
+         (result)
+         parsed-csv headers rows)
+    (setq result (progn
+                       (with-temp-file temp-file (insert body))
+                       (shell-command-to-string command)))
+    (setq result (string-trim result))
+    ; If the result begins with a ‘|’, assume it’s an Org table and align it
+    ;; (when (string-match-p "\\`[[:space:]]*|" result)
+    ;;   (with-temp-buffer
+    ;;     (insert result)
+    ;;     (goto-char (point-min))
+    ;;     (org-table-align)
+    ;;     (setq result (string-trim (buffer-string)))))
+
+    result))
 
 (defvar org-babel-default-header-args:mermaid
   '((:results . "file") (:exports . "results"))

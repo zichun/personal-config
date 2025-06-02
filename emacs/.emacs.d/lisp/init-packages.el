@@ -101,6 +101,7 @@
                           org-present
                           ob-rust
                           org-tree-slide
+                          csv
                           )
   "Default packages")
 

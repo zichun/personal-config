@@ -24,6 +24,7 @@
                             :features ""
                             :loadOutDirsFromCheck nil
                             :noDefaultFeatures t
+                            :targetDir "target/rust-analyzer" ;; Custom target directory
                             :target nil)
                     ;; Limit analysis scope
                     :procMacro (:enable nil)
