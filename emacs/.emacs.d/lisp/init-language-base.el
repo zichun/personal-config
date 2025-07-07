@@ -94,4 +94,19 @@
 (require 'init-language-cpp)
 (require 'init-language-copilot)
 
+(require 'kusto-ts-mode)
+(require 'init-language-kusto)
+
+
+;; flyover (https://github.com/konrad1977/flyover)
+(add-hook 'flycheck-mode-hook #'flyover-mode)
+
+;; Possible values: error, warning, info
+(setq flyover-levels '(error warning))  ; Show all levels
+(setq flyover-use-theme-colors t)
+(setq flyover-background-lightness 45)
+(setq flyover-percent-darker 40)
+;; "Percentage to lighten or darken the text when tinting is enabled."
+(setq flyover-text-tint-percent 50)
+
 (provide 'init-language-base)

@@ -143,6 +143,8 @@
 (require 'ob)
 (require 'ob-eval)
 
+(add-to-list 'org-src-lang-modes '("kusto" . kusto-ts))
+
 (defvar org-babel-default-header-args:kusto
   '((:results . "table") (:exports . "results"))
   "Default arguments for evaluatiing a kusto source block.")

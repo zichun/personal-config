@@ -86,6 +86,7 @@
                           org-bullets
                           svg-tag-mode
                           olivetti
+                          flyover
 
                           ; themes
                           molokai-theme
