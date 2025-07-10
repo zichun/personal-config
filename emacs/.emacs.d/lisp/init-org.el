@@ -149,6 +149,66 @@
   '((:results . "table") (:exports . "results"))
   "Default arguments for evaluatiing a kusto source block.")
 
+(defvar-local my-org-babel-temp-file nil
+  "Buffer-local variable to store the path of a temporary babel file.")
+(defvar-local my-org-babel-temp-dir nil
+  "Buffer-local variable to store the path of a temporary babel directory.")
+
+(defun my-org-babel-cleanup-temp-file ()
+  "Clean up the temporary file and directory used for Org Babel LSP.
+This function is intended to be run from a `kill-buffer-hook`."
+  (when (and my-org-babel-temp-file (file-exists-p my-org-babel-temp-file))
+    (message "Deleting temp org-babel file: %s" my-org-babel-temp-file)
+    (delete-file my-org-babel-temp-file))
+  (when (and my-org-babel-temp-dir
+             (file-directory-p my-org-babel-temp-dir)
+             ;; Check if the directory is empty (safer)
+             (null (directory-files my-org-babel-temp-dir 't)))
+    (message "Deleting temp org-babel directory: %s" my-org-babel-temp-dir)
+    (delete-directory my-org-babel-temp-dir)))
+
+(defun org-babel-edit-prep:kusto (babel-info)
+  "Prepare an Org Babel buffer for Kusto editing with eglot LSP support.
+
+If the babel block has a `:file` header, use that file path.
+Otherwise, create a temporary file within the current project root
+to provide a context for eglot. This version correctly handles
+cleanup by using buffer-local variables."
+  (let* ((file-in-header (alist-get :file (caddr babel-info)))
+         (project-root (when-let (proj (project-current))
+                         (project-root proj)))
+         ;; Create a unique temp directory name within the project
+         (temp-dir (and project-root
+                        (expand-file-name ".org-babel-temp/" project-root)))
+         ;; Create the temp file (make-temp-file will create the file on disk)
+         (temp-file (and temp-dir
+                         (progn
+                           (make-directory temp-dir t) ; Ensure directory exists
+                           (make-temp-file "kusto-src-" nil ".kql" nil)))))
+
+    ;; --- 1. Set the buffer's file name for eglot ---
+    (cond
+     ;; Priority 1: Use the :file attribute if it exists.
+     (file-in-header
+      (setq-local buffer-file-name (expand-file-name file-in-header)))
+
+     ;; Priority 2: Use a temporary file inside the project root.
+     (temp-file
+      (setq-local buffer-file-name temp-file)
+      ;; **THE FIX**: Store paths in buffer-local variables.
+      (setq-local my-org-babel-temp-file temp-file)
+      (setq-local my-org-babel-temp-dir temp-dir)
+      ;; Add a hook to clean up the temp file when the edit buffer is killed.
+      (add-hook 'kill-buffer-hook #'my-org-babel-cleanup-temp-file nil 'local))
+
+     ;; Fallback: No project found, so no LSP context is possible.
+     (t
+      (message "LSP support disabled: no :file attribute and no project root found.")))
+
+    ;; --- 2. Activate major mode and eglot ---
+;    (kusto-ts-mode)
+    (eglot-ensure)))
+
 (defun org-babel-execute:kusto (body params)
   (let* ((temp-file (org-babel-temp-file "org-kusto-" ".kql"))
          (command (concat "powershell -noprofile -noninteractive "

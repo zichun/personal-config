@@ -18,13 +18,6 @@
 ;; Optional: Configure Eglot settings for Kusto
 (defun kusto-eglot-config ()
   "Configure Eglot settings for Kusto mode."
-  ;; Customize completion behavior
-  ;; (setq-local completion-at-point-functions
-  ;;             (list (cape-capf-super
-  ;;                    #'eglot-completion-at-point
-  ;;                    #'cape-file)))
-
-  ;; Optional: Configure how completions are displayed
   (setq-local eglot-autoshutdown t)  ; Shutdown LSP server when last buffer is closed
   (setq-local eglot-sync-connect-timeout 10)  ; Connection timeout in seconds
   )
@@ -43,6 +36,19 @@
               (setq-local corfu-auto t)  ; Enable automatic completion
               (setq-local corfu-auto-delay 0.2)  ; Delay before showing completions
               (setq-local corfu-auto-prefix 2))))  ; Minimum prefix length
+
+;; Advice to fix null params for Kusto LSP only
+(defun kusto-lsp-fix-shutdown-params (orig-fun connection method params &rest args)
+  "Fix null params in shutdown request for Kusto LSP servers."
+  (if (and (object-of-class-p connection 'eglot-kusto-lsp)
+           (eq method :shutdown)
+           (null params))
+      ;; For Kusto LSP shutdown, don't pass params at all
+      (apply orig-fun connection method args)
+    ;; Normal call for everything else
+    (apply orig-fun connection method params args)))
+
+;(advice-add 'jsonrpc-request :around #'kusto-lsp-fix-shutdown-params)
 
 ;; Provide feature
 (provide 'init-language-kusto)
