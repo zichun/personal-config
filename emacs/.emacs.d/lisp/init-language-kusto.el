@@ -37,18 +37,31 @@
               (setq-local corfu-auto-delay 0.2)  ; Delay before showing completions
               (setq-local corfu-auto-prefix 2))))  ; Minimum prefix length
 
-;; Advice to fix null params for Kusto LSP only
-(defun kusto-lsp-fix-shutdown-params (orig-fun connection method params &rest args)
-  "Fix null params in shutdown request for Kusto LSP servers."
-  (if (and (object-of-class-p connection 'eglot-kusto-lsp)
-           (eq method :shutdown)
-           (null params))
-      ;; For Kusto LSP shutdown, don't pass params at all
-      (apply orig-fun connection method args)
-    ;; Normal call for everything else
-    (apply orig-fun connection method params args)))
+(defvar kusto-lsp--current-server nil)
 
-;(advice-add 'jsonrpc-request :around #'kusto-lsp-fix-shutdown-params)
+;; Advice to track current server
+(defun kusto-lsp--track-server (orig-fun server &rest args)
+  "Track the current server for context."
+  (let ((kusto-lsp--current-server server))
+    (apply orig-fun server args)))
+
+(advice-add #'jsonrpc-request :around #'kusto-lsp--track-server)
+
+;; Advice to fix JSON encoding for shutdown requests
+(defun kusto-lsp-fix-shutdown-json (orig-fun object)
+  "Remove null params from shutdown requests for Kusto LSP."
+  (if (and kusto-lsp--current-server
+           (listp object)
+           (equal (plist-get object :method) "shutdown")
+           (plist-member object :params)
+           (null (plist-get object :params)))
+      ;; Remove :params from the plist
+      (let ((fixed-object (copy-sequence object)))
+        (cl-remf fixed-object :params)
+        (funcall orig-fun fixed-object))
+    (funcall orig-fun object)))
+
+(advice-add #'jsonrpc--json-encode :around #'kusto-lsp-fix-shutdown-json)
 
 ;; Provide feature
 (provide 'init-language-kusto)
