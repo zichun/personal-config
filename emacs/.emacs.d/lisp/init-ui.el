@@ -7,10 +7,9 @@
 (setq column-number-mode t)
 (setq line-number-mode t)
 (display-time)
-(tool-bar-mode 0)
-(menu-bar-mode 0)
-(when (fboundp 'scroll-bar-mode)
-  (scroll-bar-mode 0))
+(when (fboundp 'tool-bar-mode) (tool-bar-mode 0))
+(when (fboundp 'menu-bar-mode) (menu-bar-mode 0))
+(when (fboundp 'scroll-bar-mode) (scroll-bar-mode 0))
 (setq inhibit-startup-message t)
 (setq electric-pair-mode nil) ; disable auto matching of braces
 (setq visible-bell t)
