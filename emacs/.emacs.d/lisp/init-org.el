@@ -120,6 +120,7 @@
 ;;   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 (use-package org-superstar
+  :defer t
   :after org
   :hook (org-mode . org-superstar-mode)
   :custom
@@ -323,6 +324,7 @@ returned as a list."
     (list result-type vars)))
 
 (use-package ob-rust
+  :defer t
   :if (executable-find "rustc")
   :init (add-to-list 'org-babel-load-languages '(rust . t)))
 
@@ -367,6 +369,7 @@ returned as a list."
   (zc/org-present-prepare-slide))
 
 (use-package org-present
+  :defer t
   :bind (:map org-present-mode-keymap
          ("C-c C-n" . zc/org-present-next)
          ("C-c C-p" . zc/org-present-prev))

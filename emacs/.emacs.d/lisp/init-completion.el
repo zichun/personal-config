@@ -1,24 +1,23 @@
 (require 'general)
 
 (use-package marginalia
-  :general
-  (:keymaps 'minibuffer-local-map
-            "M-A" 'marginalia-cycle)
+  :defer t
+  :bind (:map minibuffer-local-map
+         ("M-A" . marginalia-cycle))
   :custom
   (marginalia-max-relative-age 0)
   (marginalia-align 'right)
-  :init
-  (marginalia-mode))
+  :hook (after-init . marginalia-mode))
 
 (use-package all-the-icons-completion
+  :defer t
   :after (marginalia all-the-icons)
   :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
   :init
   (all-the-icons-completion-mode))
 
 (use-package vertico
-  :demand t                             ; Otherwise won't get loaded immediately
-
+  :demand t
   :straight (vertico :files (:defaults "extensions\\*") ; Special recipe to load extensions conveniently
                      :includes (vertico-indexed
                                 vertico-flat
@@ -141,11 +140,12 @@
          ("C-r" . swiper-backward)))
 
 (use-package consult-ls-git
-  :ensure t
+  :defer t
   :bind
   (("C-c g" . #'consult-ls-git)))
 
 (use-package hotfuzz
+  :defer t
   :custom
   (completion-styles '(hotfuzz))
   (completion-ignore-case 't))

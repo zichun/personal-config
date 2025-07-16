@@ -50,6 +50,7 @@
   ("C-c C-c f" . eglot-format-buffer))
 
 (use-package flycheck-rust
+  :defer t
   :config (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
 
 (require 'cl-lib)

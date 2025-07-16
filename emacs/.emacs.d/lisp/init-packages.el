@@ -3,126 +3,140 @@
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ("melpa-stable" . "https://stable.melpa.org/packages/")
                          ("org" . "https://orgmode.org/elpa/")
-                         ("elpa" . "https://elpa.gnu.org/packages/")))
-; (add-to-list 'package-archives
-;              '("marmalade" . "http://marmalade-repo.org/packages/"))
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
+                         ("elpa" . "https://elpa.gnu.org/packages/")
+;                         ("marmalade" . "http://marmalade-repo.org/packages/")
+                         ))
 
-;(package-initialize)
+(require 'use-package)
+(setq use-package-always-ensure t)
+(setq use-package-verbose t)
 
-(defvar zichun/packages '(; misc / tools
-                          use-package
-                          general
-                          auto-complete
-;                          autopair
-                          gist
-                          htmlize
-;                          marmalade
-                          restclient
-                          multiple-cursors
-                          expand-region
-                          highlight-symbol
-                          smex
-                          highlight2clipboard
-                          hl-anything
-                          git-messenger
-                          git-gutter
-                          git-gutter-fringe
-                          swiper
-                          prog-fill
-                          shell-pop
-                          golden-ratio
-                          flycheck
-                          anzu
-                          deadgrep
-                          ivy
-                          counsel
+;; Essential packages that need to be loaded early
+(use-package general
+  :demand t)
 
-                          ; completion
-                          all-the-icons-completion
-                          consult
-                          consult-ls-git
-                          marginalia
-                          vertico
-                          hotfuzz
-                          orderless
-                          corfu
-                          kind-icon
+(use-package which-key
+  :demand t
+  :init (which-key-mode)
+  :diminish which-key-mode
+  :config
+  (setq which-key-idle-delay 0.3))
 
-                          ; modes
-                          company
-                          log4j-mode
-                          ggtags
-                          projectile
-                          rainbow-delimiters
-                          flx-ido
-                          ido-vertical-mode
-                          powershell
-                          magit
+;; Additional utility packages commonly used
+(use-package gist
+  :defer t)
 
-                          ; language modes
-                          rustic
-                          lsp-mode
-                          lsp-ui
-                          fsharp-mode
-                          markdown-mode
-                          yaml-mode
-                          js3-mode
-                          web-mode
-                          tide
-                          yasnippet
-                          flycheck-rust
-			              treesit-auto
+(use-package htmlize
+  :defer t)
 
-                          ; UI
-                          spaceline
-                          doom-modeline
-                          doom-themes
-                          solaire-mode
-                          ivy-posframe
-                          ivy-rich
-                          org-bullets
-                          svg-tag-mode
-                          olivetti
-                          flyover
+(use-package restclient
+  :defer t)
 
-                          ; themes
-                          molokai-theme
-                          monokai-theme
-                          subatomic256-theme
-                          flatland-theme
-                          badwolf-theme
-                          vscode-dark-plus-theme
-                          adwaita-dark-theme
+(use-package highlight-symbol
+  :defer t)
 
-                          ; org
-                          org-superstar
-                          org-present
-                          ob-rust
-                          org-tree-slide
-                          csv
-                          )
-  "Default packages")
+(use-package smex
+  :defer t)
 
-(require 'cl-lib)
+(use-package highlight2clipboard
+  :defer t)
 
-(defun zichun/packages-installed-p ()
-  (cl-loop for pkg in zichun/packages
-        when (not (package-installed-p pkg)) do (cl-return nil)
-        finally (return t)))
+(use-package hl-anything
+  :defer t)
 
-(unless (zichun/packages-installed-p)
-  (message "%s" "Refreshing package database...")
-  (package-refresh-contents)
-  (dolist (pkg zichun/packages)
-    (when (not (package-installed-p pkg))
-      (package-install pkg))))
+(use-package git-gutter
+  :defer t)
 
-;;
-;; Bootstrap Straight.el
-;;
+(use-package git-gutter-fringe
+  :defer t)
+
+(use-package deadgrep
+  :defer t)
+
+(use-package flycheck
+  :defer t)
+
+(use-package projectile
+  :defer t)
+
+(use-package flx-ido
+  :defer t)
+
+(use-package ido-vertical-mode
+  :defer t)
+
+(use-package magit
+  :defer t)
+
+;; Language modes
+(use-package rustic
+  :defer t)
+
+(use-package fsharp-mode
+  :defer t)
+
+(use-package markdown-mode
+  :defer t)
+
+(use-package yaml-mode
+  :defer t)
+
+(use-package js3-mode
+  :defer t)
+
+(use-package web-mode
+  :defer t)
+
+(use-package tide
+  :defer t)
+
+(use-package yasnippet
+  :defer t)
+
+;; UI packages
+(use-package spaceline
+  :defer t)
+
+(use-package solaire-mode
+  :defer t)
+
+(use-package svg-tag-mode
+  :defer t)
+
+(use-package olivetti
+  :defer t)
+
+;; Theme packages
+(use-package molokai-theme
+  :defer t)
+
+(use-package monokai-theme
+  :defer t)
+
+(use-package subatomic256-theme
+  :defer t)
+
+(use-package flatland-theme
+  :defer t)
+
+(use-package badwolf-theme
+  :defer t)
+
+(use-package vscode-dark-plus-theme
+  :defer t)
+
+(use-package adwaita-dark-theme
+  :defer t)
+
+;; Org mode packages
+(use-package org-superstar
+  :defer t)
+
+(use-package org-present
+  :defer t)
+
+(use-package org-tree-slide
+  :defer t)
 
 (defvar bootstrap-version)
 (let ((bootstrap-file
