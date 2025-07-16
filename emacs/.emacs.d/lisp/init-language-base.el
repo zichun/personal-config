@@ -8,12 +8,12 @@
 
 ;; Tree-sitter integration (modern syntax parsing)
 (use-package treesit-auto
-  :demand t
+  :defer t
+  :hook (find-file . treesit-auto-mode)
   :custom
   (treesit-auto-install 'prompt)
   :config
-  (treesit-auto-add-to-auto-mode-alist '(rust toml c++))
-  (global-treesit-auto-mode))
+  (treesit-auto-add-to-auto-mode-alist '(rust toml c++)))
 
 ;; Enhanced language-specific configurations
 (setq auto-mode-alist

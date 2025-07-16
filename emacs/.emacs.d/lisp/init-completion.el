@@ -2,13 +2,13 @@
 ;; This replaces the older ivy/counsel setup
 
 (use-package marginalia
+  :defer t
   :bind (:map minibuffer-local-map
          ("M-A" . marginalia-cycle))
   :custom
   (marginalia-max-relative-age 0)
   (marginalia-align 'right)
-  :init
-  (marginalia-mode))
+  :hook (after-init . marginalia-mode))
 
 (use-package all-the-icons-completion
   :after (marginalia all-the-icons)
