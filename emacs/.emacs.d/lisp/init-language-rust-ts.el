@@ -24,6 +24,7 @@
                     :checkOnSave (:enable :json-false)
                     :cargo (:buildScripts (:enable :json-false)
                             :features []
+                            :extraEnv (:)
                             :loadOutDirsFromCheck :json-false
                             :noDefaultFeatures :json-true
                             :targetDir "target/rust-analyzer" ;; Custom target directory
