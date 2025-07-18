@@ -20,16 +20,16 @@
                  ("rust-analyzer"
                   :initializationOptions (
                     :check (:command "clippy")
-                    ;; Explicitly disable expensive initial operations
-                    :checkOnSave (:enable nil)
-                    :cargo (:buildScripts (:enable nil)
-                            :features ""
-                            :loadOutDirsFromCheck nil
-                            :noDefaultFeatures t
+                    ;; Properly configure rust-analyzer settings with correct JSON types
+                    :checkOnSave (:enable :json-false)
+                    :cargo (:buildScripts (:enable :json-false)
+                            :features []
+                            :loadOutDirsFromCheck :json-false
+                            :noDefaultFeatures :json-true
                             :targetDir "target/rust-analyzer" ;; Custom target directory
-                            :target nil)
+                            :target :json-null)
                     ;; Limit analysis scope
-                    :procMacro (:enable nil)
+                    :procMacro (:enable :json-false)
                     :diagnostics (:disabled ["unresolved-import"
                                             "unresolved-proc-macro"])
                     :files (:excludeDirs ["target" "tests" "examples"])
