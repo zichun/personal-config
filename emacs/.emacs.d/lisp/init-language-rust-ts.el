@@ -6,39 +6,78 @@
   :config	(eglot-booster-mode))
 
 ;; Configure eglot with rust-analyzer
+;; (use-package eglot
+;;   :ensure t
+;;   :defer t
+;;   :hook ((rust-ts-mode . eglot-ensure)
+;;          (rust-ts-mode . flycheck-mode)
+;;          )
+;; ;         (rust-ts-mode . eglot-inlay-hints-mode))
+;;   :config
+;;   ;; Properly configure rust-analyzer with logging and improved settings
+;;   (add-to-list 'eglot-server-programs
+;;                '((rust-ts-mode rust-mode) .
+;;                  ("rust-analyzer"
+;;                   :initializationOptions (
+;;                     :check (:command "clippy")
+;;                     ;; Explicitly disable expensive initial operations
+;;                     :checkOnSave (:enable nil)
+;;                     :cargo (:buildScripts (:enable nil)
+;;                             :features ""
+;;                             :loadOutDirsFromCheck nil
+;;                             :noDefaultFeatures t
+;;                             :targetDir "target/rust-analyzer" ;; Custom target directory
+;;                             :target nil)
+;;                     ;; Limit analysis scope
+;;                     :procMacro (:enable nil)
+;;                     :diagnostics (:disabled ["unresolved-import"
+;;                                             "unresolved-proc-macro"])
+;;                     :files (:excludeDirs ["target" "tests" "examples"])
+;;                     :lruCapacity 64))))
+;;   :custom
+;;   ((eglot-sync-connect nil)         ;; Don't wait for server
+;;    (eglot-events-buffer-size 0)     ;; Disable events buffer
+;;    (eglot-autoshutdown t)          ;; Shutdown when not needed
+;;    (eglot-connect-timeout 30)))     ;; Timeout for connection attempts
+
 (use-package eglot
   :ensure t
   :defer t
   :hook ((rust-ts-mode . eglot-ensure)
-         (rust-ts-mode . flycheck-mode)
-         )
-;         (rust-ts-mode . eglot-inlay-hints-mode))
+         (rust-ts-mode . flymake-mode))
   :config
-  ;; Properly configure rust-analyzer with logging and improved settings
+  ;; Optimization: Increase the amount of data Eglot accepts in one chunk
+  ;; (improves performance on big outputs like "cargo check")
+  (setq eglot-events-buffer-size 0
+        eglot-connect-timeout 30
+        json-serialize-default-json-false :json-false)
+
   (add-to-list 'eglot-server-programs
-               '((rust-ts-mode rust-mode) .
+               `((rust-ts-mode rustic-mode rust-mode) .
                  ("rust-analyzer"
-                  :initializationOptions (
-                    :check (:command "clippy")
-                    ;; Explicitly disable expensive initial operations
-                    :checkOnSave (:enable nil)
-                    :cargo (:buildScripts (:enable nil)
-                            :features ""
-                            :loadOutDirsFromCheck nil
-                            :noDefaultFeatures t
-                            :targetDir "target/rust-analyzer" ;; Custom target directory
-                            :target nil)
-                    ;; Limit analysis scope
-                    :procMacro (:enable nil)
-                    :diagnostics (:disabled ["unresolved-import"
-                                            "unresolved-proc-macro"])
-                    :files (:excludeDirs ["target" "tests" "examples"])
-                    :lruCapacity 64))))
-  :custom
-  ((eglot-sync-connect nil)         ;; Don't wait for server
-   (eglot-events-buffer-size 0)     ;; Disable events buffer
-   (eglot-autoshutdown t)          ;; Shutdown when not needed
-   (eglot-connect-timeout 30)))     ;; Timeout for connection attempts
+                  :initializationOptions
+                  (
+                   ;; -------------------------------------------------
+                   ;; PERFORMANCE OPTIMIZATIONS FOR LARGE PROJECTS
+                   ;; -------------------------------------------------
+
+                   ;; Disable Check On Save to prevent blocking during rapid edits.
+                   ;; Note: We use :json-false to send actual `false`, not `null`.
+                   :checkOnSave :json-false
+
+                   ;; Limit cargo operations
+                   :cargo (:buildScripts (:enable :json-false)
+                           :features "all") ;; "all" or explicit list. Empty string "" is invalid.
+
+                   ;; Disable Proc Macros (Huge speed boost, but might break macro autocomplete)
+                   :procMacro (:enable :json-false)
+
+                   ;; Exclude heavy directories
+                   :files (:excludeDirs ["target" "tests" "examples" "node_modules"])
+
+                   ;; Disable expensive diagnostics
+                   :diagnostics (:disabled ["unresolved-import" "unresolved-proc-macro" "inactive-code"])
+                   )))))
 
 (use-package rust-mode
   :init
