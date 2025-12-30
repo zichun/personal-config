@@ -1,9 +1,9 @@
-(use-package eglot-booster
-  :vc (:url "https://github.com/jdtsmith/eglot-booster"
-            :rev :newest
-            :branch "main")
-  :after eglot
-  :config	(eglot-booster-mode))
+;; (use-package eglot-booster
+;;   :vc (:url "https://github.com/jdtsmith/eglot-booster"
+;;             :rev :newest
+;;             :branch "main")
+;;   :after eglot
+;;   :config	(eglot-booster-mode))
 
 ;; Configure eglot with rust-analyzer
 ;; (use-package eglot

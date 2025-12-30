@@ -58,6 +58,9 @@
   (doom-modeline-icon t)
   (doom-modeline-major-mode-icon t)
   (doom-modeline-major-mode-color-icon t)
+  ;; Use Nerd Icons
+  (doom-modeline-icon (display-graphic-p))
+
   (doom-modeline-minor-modes nil)
   (doom-modeline-enable-word-count nil)
   (doom-modeline-checker-simple-format t)
@@ -102,10 +105,10 @@
 ;; The uniquify library makes it so that when you visit two files with the same name in different directories,
 ;; the buffer names have the directory name appended to them instead of the silly hello<2> names you get by default.
 ;;
-(use-package uniquify
-  :ensure nil  ; Built-in package
-  :custom
-  (uniquify-buffer-name-style 'forward))
+;(use-package uniquify
+;  :ensure nil  ; Built-in package
+;  :custom
+;  (uniquify-buffer-name-style 'forward))
 
 ;;
 ;; The saveplace library saves the location of the point when you kill a buffer

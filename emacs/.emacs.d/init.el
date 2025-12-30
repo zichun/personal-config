@@ -1,11 +1,7 @@
 (defvar native-comp-deferred-compilation-deny-list nil)
 
-;; Added by Package.el.  This must come before configurations of
-;; installed packages.  Don't delete this line.  If you don't want it,
-;; just comment it out by adding a semicolon to the start of the line.
-;; You may delete these explanatory comments.
-(setq package-native-compile t)
-(package-initialize)
+;; Package initialization is handled by init-packages.el (using straight.el)
+;; (package-initialize) ;; Removed to prevent double-loading warnings with straight.el
 
 (setq gc-cons-threshold (* 50 1000 1000))
 ;; Reduce background work
@@ -30,7 +26,7 @@
 (require 'init-tools)
 (require 'init-org)
 (require 'notebook)
-;(require 'init-magit)
+                                        ;(require 'init-magit)
 
 (require 'init-language-base)
 
@@ -55,11 +51,11 @@
       auto-save-interval 200            ; number of keystrokes between auto-saves (default: 300)
       )
 
-; do not check if remote files are readable
+                                        ; do not check if remote files are readable
 (setq recentf-keep '(file-remote-p file-readable-p))
 (setq recentf-exclude (quote ("Z:\\'")))
 
-;
+                                        ;
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -68,9 +64,7 @@
  ;; If there is more than one, they won't work right.
  '(package-vc-selected-packages
    '((copilot :url "https://github.com/copilot-emacs/copilot.el" :branch
-              "main")
-     (eglot-booster :url "https://github.com/jdtsmith/eglot-booster"
-                    :branch "main"))))
+              "main"))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

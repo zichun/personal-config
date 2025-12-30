@@ -42,11 +42,6 @@
 (require 'init-language-cpp)
 (require 'init-language-copilot)
 
-;; Kusto language support
-(require 'kusto-ts-mode)
-(require 'init-language-kusto)
-
-
 (use-package flyover
   :defer t
   :hook (flycheck-mode . flyover-mode)
@@ -66,9 +61,16 @@
   (flyover-show-at-eol t)
   (flyover-hide-when-cursor-is-on-same-line t)
   (flyover-virtual-line-icon "─►")
-;  (flyover-line-position-offset 1)
-
   ;; Performance
   (flyover-debounce-interval 0.1))
+
+;; Ensure Treesit-auto installs grammars
+(use-package treesit-auto
+  :demand t
+  :custom
+  (treesit-auto-install 'prompt)
+  :config
+  (treesit-auto-add-to-auto-mode-alist 'all)
+  (global-treesit-auto-mode))
 
 (provide 'init-language-base)

@@ -1,25 +1,88 @@
 (require 'org)
 (require 'org-tempo)
-(require 'csv)
+
+(use-package org-modern
+  :defer t)
+  ;; This enables the vertical line in the fringe for blocks
+  ;; Optional: Hides the "Source Block" text for a cleaner look
+
+(require 'color)
+(defun my-theme-darker-bg (&optional amount)
+  "Return a darker version of the current theme background.
+AMOUNT is a percentage to darken (default 10)."
+  (let* ((bg (face-background 'default nil t))
+         (amt (or amount 10)))
+    (when bg
+      (color-darken-name bg amt))))
+
+(require 'hotsauce-mode)
 
 (defun zc/org-mode-setup ()
-  (org-indent-mode)
   (auto-fill-mode 0)
   (visual-line-mode 1)
 
   ;; Get rid of the background on column views
-  (set-face-attribute 'org-column nil :background nil)
-  (set-face-attribute 'org-column-title nil :background nil)
+  (set-face-attribute 'org-column nil :background 'unspecified)
+  (set-face-attribute 'org-column-title nil :background 'unspecified)
 
   (set-face-attribute 'org-document-title nil :font "Consolas" :weight 'bold :height 1.3)
+  ;; Modern Org UI
+  (global-org-modern-mode)
+  (org-indent-mode)
+
+  ;; Disable element cache to prevent parser errors in large files
+  (setq org-element-use-cache nil)
+
+  (setq
+   ;; Edit settings
+   org-startup-indented t
+   org-auto-align-tags nil
+   org-tags-column 0
+   org-catch-invisible-edits 'show-and-error
+   org-special-ctrl-a/e t
+   org-insert-heading-respect-content t
+   org-modern-keyword nil
+   org-modern-block-fringe 10
+   org-modern-hide-stars nil
+   org-modern-table nil
+   org-modern-list '(;; (?- . "-")
+                     (?* . "•")
+                     (?+ . "‣"))
+   ;; Org styling, hide markup etc.
+   org-hide-emphasis-markers t
+   org-pretty-entities t
+   org-agenda-tags-column 0
+   org-ellipsis "…")
+
+  (set-face-attribute 'org-document-title nil :font "Consolas" :weight 'bold :height 1.3)
+
+  ;; Customize Org Block to have a distinct background and left border
   (custom-theme-set-faces
    'user
-   `(org-level-5 ((t :inherit outline-5 :height 1.1)))
-   `(org-level-4 ((t :inherit outline-4 :height 1.15)))
-   `(org-level-3 ((t :inherit outline-3 :font "Cambria" :height 1.35 :underline (:color foreground-color :style line) :overline (:color foreground-color :style line))))
-   `(org-level-2 ((t :inherit outline-2 :font "Cambria" :height 1.65 :underline (:color foreground-color :style line) :overline (:color foreground-color :style line))))
-   `(org-level-1 ((t :inherit outline-1 :font "Cambria" :height 2.0 :underline (:color foreground-color :style line) :overline (:color foreground-color :style line))))
-   `(org-block-begin-line ((nil :font "Consolas" :height 0.8 :slant italic))))
+   `(org-block
+     ((t (:background ,(my-theme-darker-bg 8)
+                      :height 0.9
+                      :extend t))))
+   `(org-block-begin-line
+     ((t (:background ,(my-theme-darker-bg 20)
+                      :height 1.1
+                      :extend t))))
+   `(org-block-end-line
+     ((t (:background ,(my-theme-darker-bg 20)
+                      :height 0.9
+                      :extend t)))))
+
+  ;; hotsauce-mode (src-block colorization)
+  (setq
+   hotsauce-margin-width 4
+   hotsauce-secondary-bar-color-fn (lambda () (my-theme-darker-bg 16))
+   hotsauce-language-face-alist '(("rust" . font-lock-keyword-face)
+                                  ("c"   . font-lock-type-face)
+                                  ("c++" . font-lock-type-face)
+                                  ("cpp" . font-lock-type-face)
+                                  ("powershell" . font-lock-builtin-face))
+   )
+  (hotsauce-mode)
   )
 
 (use-package org
@@ -31,7 +94,7 @@
   (setq org-default-journal-file (concat org-directory "/journal.org"))
   (setq org-default-todo-file (concat org-directory "/todo.org"))
   (setq org-default-personal-file (concat org-directory "/personal.org"))
-  (setq org-catch-invisible-edits 'show-and-error)
+  (setq org-fold-catch-invisible-edits 'show-and-error)
 
   (setq org-agenda-files (list (symbol-value 'org-default-journal-file)))
 
@@ -54,16 +117,16 @@
            :empty-lines 1)
 
           ;; New Incident template
-        ("i" "Incident"
-         entry
-         (file+datetree (lambda ()
-                 (let ((incident-number (read-string "Incident number: ")))
-                   (setq org-capture-incident-number incident-number) ; store temporarily
-                   (expand-file-name (format "icm/%s.org" incident-number) org-directory))))
-         "* Incident [[https://portal.microsofticm.com/imp/v5/incidents/details/%(identity org-capture-incident-number)/summary][%(identity org-capture-incident-number)]]\n\n%?\n"
-         :empty-lines 1)
+          ("i" "Incident"
+           entry
+           (file+datetree (lambda ()
+                            (let ((incident-number (read-string "Incident number: ")))
+                              (setq org-capture-incident-number incident-number) ; store temporarily
+                              (expand-file-name (format "icm/%s.org" incident-number) org-directory))))
+           "* Incident [[https://portal.microsofticm.com/imp/v5/incidents/details/%(identity org-capture-incident-number)/summary][%(identity org-capture-incident-number)]]\n\n%?\n"
+           :empty-lines 1)
 
-        ))
+          ))
 
   ;; Enable inline highlighting for codeblocks
   (setq org-src-fontify-natively t)
@@ -78,11 +141,18 @@
   ;; Hide emphasis char
   (setq org-hide-emphasis-markers t)
 
+  ;; Enable org-appear for auto-toggling marks
+  (add-hook 'org-mode-hook 'org-appear-mode)
+  (setq org-appear-autoemphasis t
+        org-appear-autosubmarkers t
+        org-appear-autolinks t)
+
   ;; whole heading line is fontified
   (setq org-fontify-whole-heading-line t
         org-fontify-done-headline t
         org-fontify-quote-and-verse-blocks t)
 
+  ;; Use org-modern for bullet-point niceness (already enabled via global-org-modern-mode)
   (add-to-list 'org-emphasis-alist
                '("*" (:inherit font-lock-warning-face :height 1.8 :weight bold)))
 
@@ -106,8 +176,8 @@
   (interactive)
   (find-file org-default-journal-file))
 
-;;(defun org-outlook-open (path) (w32-shell-execute "open" "C:/Program Files (x86)/Microsoft Office/root/Office16/OUTLOOK.exe" (concat "outlook:" path)))
-;;(org-add-link-type "outlook" 'org-outlook-open)
+  ;;(defun org-outlook-open (path) (w32-shell-execute "open" "C:/Program Files (x86)/Microsoft Office/root/Office16/OUTLOOK.exe" (concat "outlook:" path)))
+  ;;(org-add-link-type "outlook" 'org-outlook-open)
 
 (defun org-insert-clipboard-image ()
   "Insert clipboard image into org"
@@ -115,17 +185,23 @@
   (call-process-shell-command "powershell.exe Get-OrgImageLink")
   (yank))
 
+(use-package org-modern-indent
+  :defer t
+  :straight (org-modern-indent :type git :host github :repo "jdtsmith/org-modern-indent")
+  :config
+  (add-hook 'org-mode-hook #'org-modern-indent-mode))
+
 ;; (use-package org-bullets
 ;;   :config
 ;;   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
-(use-package org-superstar
-  :defer t
-  :after org
-  :hook (org-mode . org-superstar-mode)
-  :custom
-  (org-superstar-remove-leading-stars t)
-  (org-superstar-headline-bullets-list '("‣" "•" "○" "○" "●" "○" "●")))
+; (use-package org-superstar
+;  :defer t
+;  :after org
+;  :hook (org-mode . org-superstar-mode)
+;  :custom
+;  (org-superstar-remove-leading-stars t)
+;  (org-superstar-headline-bullets-list '("‣" "•" "○" "○" "●" "○" "●")))
 
 ;; Make sure org-indent face is available
 (require 'org-indent)
@@ -144,12 +220,6 @@
 (require 'ob)
 (require 'ob-eval)
 
-(add-to-list 'org-src-lang-modes '("kusto" . kusto-ts))
-
-(defvar org-babel-default-header-args:kusto
-  '((:results . "table") (:exports . "results"))
-  "Default arguments for evaluatiing a kusto source block.")
-
 (defvar-local my-org-babel-temp-file nil
   "Buffer-local variable to store the path of a temporary babel file.")
 (defvar-local my-org-babel-temp-dir nil
@@ -167,69 +237,6 @@ This function is intended to be run from a `kill-buffer-hook`."
              (null (directory-files my-org-babel-temp-dir 't)))
     (message "Deleting temp org-babel directory: %s" my-org-babel-temp-dir)
     (delete-directory my-org-babel-temp-dir)))
-
-(defun org-babel-edit-prep:kusto (babel-info)
-  "Prepare an Org Babel buffer for Kusto editing with eglot LSP support.
-
-If the babel block has a `:file` header, use that file path.
-Otherwise, create a temporary file within the current project root
-to provide a context for eglot. This version correctly handles
-cleanup by using buffer-local variables."
-  (let* ((file-in-header (alist-get :file (caddr babel-info)))
-         (project-root (when-let (proj (project-current))
-                         (project-root proj)))
-         ;; Create a unique temp directory name within the project
-         (temp-dir (and project-root
-                        (expand-file-name ".org-babel-temp/" project-root)))
-         ;; Create the temp file (make-temp-file will create the file on disk)
-         (temp-file (and temp-dir
-                         (progn
-                           (make-directory temp-dir t) ; Ensure directory exists
-                           (make-temp-file "kusto-src-" nil ".kql" nil)))))
-
-    ;; --- 1. Set the buffer's file name for eglot ---
-    (cond
-     ;; Priority 1: Use the :file attribute if it exists.
-     (file-in-header
-      (setq-local buffer-file-name (expand-file-name file-in-header)))
-
-     ;; Priority 2: Use a temporary file inside the project root.
-     (temp-file
-      (setq-local buffer-file-name temp-file)
-      ;; **THE FIX**: Store paths in buffer-local variables.
-      (setq-local my-org-babel-temp-file temp-file)
-      (setq-local my-org-babel-temp-dir temp-dir)
-      ;; Add a hook to clean up the temp file when the edit buffer is killed.
-      (add-hook 'kill-buffer-hook #'my-org-babel-cleanup-temp-file nil 'local))
-
-     ;; Fallback: No project found, so no LSP context is possible.
-     (t
-      (message "LSP support disabled: no :file attribute and no project root found.")))
-
-    ;; --- 2. Activate major mode and eglot ---
-;    (kusto-ts-mode)
-    (eglot-ensure)))
-
-(defun org-babel-execute:kusto (body params)
-  (let* ((temp-file (org-babel-temp-file "org-kusto-" ".kql"))
-         (command (concat "powershell -noprofile -noninteractive "
-                      "C:/repos/scripts/kusto/invoke-kusto.ps1"
-                      " -OrgFormat -QueryFile " temp-file))
-         (result)
-         parsed-csv headers rows)
-    (setq result (progn
-                       (with-temp-file temp-file (insert body))
-                       (shell-command-to-string command)))
-    (setq result (string-trim result))
-    ; If the result begins with a ‘|’, assume it’s an Org table and align it
-    ;; (when (string-match-p "\\`[[:space:]]*|" result)
-    ;;   (with-temp-buffer
-    ;;     (insert result)
-    ;;     (goto-char (point-min))
-    ;;     (org-table-align)
-    ;;     (setq result (string-trim (buffer-string)))))
-
-    result))
 
 (defvar org-babel-default-header-args:mermaid
   '((:results . "file") (:exports . "results"))
@@ -327,14 +334,6 @@ returned as a list."
   :defer t
   :if (executable-find "rustc")
   :init (add-to-list 'org-babel-load-languages '(rust . t)))
-
-;; (org-babel-do-load-languages
-;;       'org-babel-load-languages
-;;       '((mermaid . t)))
-
-;;
-;; org-present
-;;
 
 (defun zc/org-present-prepare-slide ()
   (org-overview)

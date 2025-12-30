@@ -17,12 +17,12 @@
 (global-set-key (kbd "C-S-n")
                 (lambda ()
                   (interactive)
-                  (ignore-errors (next-line 5))))
+                  (ignore-errors (forward-line 5))))
 
 (global-set-key (kbd "C-S-p")
                 (lambda ()
                   (interactive)
-                  (ignore-errors (previous-line 5))))
+                  (ignore-errors (forward-line -5))))
 
 (global-set-key (kbd "C-S-f")
                 (lambda ()
@@ -33,6 +33,42 @@
                 (lambda ()
                   (interactive)
                   (ignore-errors (backward-char 5))))
+
+(defun my/go-to-next-paren ()
+  "Jump to the next closing parenthesis or string quote.
+If on a starting parenthesis/quote, jump to the matching closing one.
+If inside a string, jump to the closing quote.
+Otherwise, go up a list level."
+  (interactive)
+  (push-mark)
+  (let ((ppss (syntax-ppss)))
+    (cond
+     ((nth 3 ppss) ;; Inside a string
+      (goto-char (nth 8 ppss)) ;; Go to the start of the string
+      (forward-sexp)) ;; Jump to the end
+     ((looking-at "\\s(\\|\\s\"") ;; On a list starter or quote
+      (forward-sexp))
+     (t
+      (up-list)))))
+
+(defun my/go-to-prev-paren ()
+  "Jump to the previous opening parenthesis or string quote.
+If immediately after a closing parenthesis/quote, jump to its matching opening one.
+If inside a string, jump to the opening quote.
+Otherwise, go backward up a list level."
+  (interactive)
+  (push-mark)
+  (let ((ppss (syntax-ppss)))
+    (cond
+     ((nth 3 ppss) ;; Inside a string
+      (goto-char (nth 8 ppss))) ;; Go to the start of the string
+     ((looking-back "\\s)\\|\\s\"" 1) ;; After a list closer or quote
+      (backward-sexp))
+     (t
+      (backward-up-list)))))
+
+(global-set-key (kbd "M-n") 'my/go-to-next-paren)
+(global-set-key (kbd "M-p") 'my/go-to-prev-paren)
 
 ;; Highlight-symbols
 ;(global-set-key [(control f1)] 'hl-highlight-mode)

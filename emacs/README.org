@@ -1,0 +1,87 @@
+#+TITLE: Emacs Configuration
+#+AUTHOR: Gemini
+#+PROPERTY: header-args :tangle no
+
+* Overview
+This is a modernized Emacs configuration focused on performance, aesthetics, and a robust generic programming environment.
+It leverages built-in Emacs 29+ features like *Tree-sitter* and *Eglot*, replacing legacy packages with precise, lightweight alternatives.
+
+* Core Features
+- **Package Management**: Built on [[https://github.com/radian-software/straight.el][straight.el]] for reproducible package builds, integrating seamlessly with ~use-package~.
+- **Performance**: Tuned garbage collection via [[https://gitlab.com/koral/gcmh][gcmh]] (Garbage Collector Magic Hack) to ensure responsiveness during heavy operations.
+- **Startup**: A clean, informative startup screen provided by [[https://github.com/emacs-dashboard/emacs-dashboard][dashboard]].
+
+* UI & UX
+- **Modeline**: [[https://github.com/seagle0128/doom-modeline][doom-modeline]] with [[https://github.com/rainstormstudio/nerd-icons.el][nerd-icons]] for a recognizable and information-dense status bar.
+- **Visuals**:
+  - ~global-display-line-numbers-mode~ enabled by default.
+  - ~diff-hl~ for git diff indicators in the fringe.
+  - ~flyover~ for inline "phantom" error messages (tooltips directly in the buffer).
+
+* Completion & Navigation
+The "Modern Stack" replaces legacy generic completion tools (Helm/Ivy) with focused, uniform components:
+- **Vertico**: Vertical interactive completion UI.
+- **Consult**: Search and navigation commands (supersedes Swiper/Counsel).
+- **Marginalia**: Rich annotations in the minibuffer (file modes, docstrings, etc.).
+- **Corfu**: In-buffer completion popup (IntelliSense-style).
+- **Orderless**: Fuzzy completion style.
+
+* Language Support
+** Generic
+- **LSP**: Built-in *Eglot* is used for all language servers.
+- **Syntax Checking**: *Flycheck* bridged with Eglot via ~flycheck-eglot~.
+- **Tree-sitter**: Used for syntax highlighting and structural navigation where supported.
+
+** Rust
+- Mode: ~rust-ts-mode~ (Tree-sitter native).
+- Server: ~rust-analyzer~ via Eglot.
+- Features: Automatic formatting, inline diagnostics.
+
+** Web Development (TypeScript/TSX/JS)
+- Modes: ~typescript-ts-mode~, ~tsx-ts-mode~, ~js-ts-mode~.
+- Features: Full LSP support for linting, refactoring, and completion.
+
+** Systems (C/C++)
+- Mode: ~c-ts-mode~ (Tree-sitter native).
+
+* Org Mode Features
+A significantly customized generic note-taking and organizing experience:
+- **Modern UI**:
+  - [[https://github.com/minad/org-modern][org-modern]] provides styled bullets, status pills, and tables.
+  - Custom block styling with dark backgrounds and left borders for source code.
+- **Editing**:
+  - [[https://github.com/awth13/org-appear][org-appear]] automatically toggles emphasis markers (like ~*bold*~ or ~/italic/~) when compiling/editing.
+  - ~org-superstar~ (legacy support for bullets).
+
+* Keybindings
+** Navigation
+| Binding | Command                | Description                                                          |
+|---------+------------------------+----------------------------------------------------------------------|
+| ~M-n~     | ~my/go-to-next-paren~    | Jump to next closing paren/quote. Handles strings intelligently.     |
+| ~M-p~     | ~my/go-to-prev-paren~    | Jump to previous opening paren/quote. Handles strings intelligently. |
+| ~M-g~     | ~goto-line~              | Jump to line number.                                                 |
+| ~f9~      | ~c-beginning-of-defun~   | Go to beginning of function.                                         |
+| ~f10~     | ~c-end-of-defun~         | Go to end of function.                                               |
+
+** Edit
+| Binding | Command                                 | Description                           |
+|---------+-----------------------------------------+---------------------------------------|
+| ~C-c l~   | ~org-store-link~                          | Store a link to the current location. |
+| ~C-c a~   | ~org-agenda~                              | Open Org Agenda.                      |
+| ~C-c c~   | ~org-capture~                             | Open Org Capture.                     |
+| ~M-]~     | ~append-line-to-scratch~                  | Copy current line to *scratch* buffer.  |
+| ~M-l~     | ~copy-current-line-position-to-clipboard~ | Copy file path and line number.       |
+
+** Project & Files
+| Binding | Command            | Description                                           |
+|---------+--------------------+-------------------------------------------------------|
+| ~C-x g~   | ~magit-status~       | Open Git status window.                               |
+| ~C-x p~   | ~project-prefix-map~ | Project.el commands (find file, switch project, etc). |
+
+* Configuration Structure
+- ~init.el~: Entry point (minimal).
+- ~lisp/init-packages.el~: Package management bootstrap.
+- ~lisp/init-ui.el~: Visual settings.
+- ~lisp/init-completion.el~: Vertico/Corfu stack.
+- ~lisp/init-language-*.el~: Language-specific configurations.
+- ~lisp/init-org.el~: Org mode customization.

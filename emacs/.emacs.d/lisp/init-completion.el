@@ -9,12 +9,14 @@
   (marginalia-align 'right)
   :hook (after-init . marginalia-mode))
 
-(use-package all-the-icons-completion
+(use-package nerd-icons-completion
   :defer t
-  :after (marginalia all-the-icons)
-  :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
+  :config
+  (nerd-icons-completion-mode)
+  :hook
+  (marginalia-mode . nerd-icons-completion-marginalia-setup)
   :init
-  (all-the-icons-completion-mode))
+  (nerd-icons-completion-mode))
 
 (use-package vertico
   :demand t
