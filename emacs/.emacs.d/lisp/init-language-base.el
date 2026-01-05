@@ -40,7 +40,7 @@
 (require 'init-language-rust-ts)
 (require 'init-language-web)
 (require 'init-language-cpp)
-(require 'init-language-copilot)
+;(require 'init-language-copilot)
 
 (use-package flyover
   :defer t

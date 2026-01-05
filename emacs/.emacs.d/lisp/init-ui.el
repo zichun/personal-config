@@ -132,7 +132,7 @@
   (with-eval-after-load 'winum
     (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
   :custom
-  (treemacs-collapse-dirs (if treemacs-python-executable 3 0))
+  (treemacs-collapse-dirs (if (or (executable-find "python3") (executable-find "python")) 3 0))
   (treemacs-deferred-git-apply-delay 0.5)
   (treemacs-directory-name-transformer #'identity)
   (treemacs-display-in-side-window t)
@@ -192,7 +192,7 @@
   (treemacs-filewatch-mode t)
   (treemacs-fringe-indicator-mode 'always)
   (pcase (cons (not (null (executable-find "git")))
-               (not (null treemacs-python-executable)))
+               (not (null (or (executable-find "python3") (executable-find "python")))))
     (`(t . t)
      (treemacs-git-mode 'deferred))
     (`(t . _)
@@ -206,5 +206,17 @@
    ("C-x t M-t" . treemacs-find-tag)))
 
 (remove-hook 'find-file-hooks 'vc-refresh-state)
+
+(use-package dashboard
+  :ensure t
+  :config
+
+  (setq dashboard-startup-banner 'logo)
+  (setq dashboard-display-icons-p 't)     ; display icons on both GUI and terminal
+  (setq dashboard-icon-type 'nerd-icons) ; use `nerd-icons' package
+  (setq dashboard-set-heading-icons 't)
+  (setq dashboard-set-file-icons 't)
+
+  (dashboard-setup-startup-hook))
 
 (provide 'init-ui)

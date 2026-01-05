@@ -30,12 +30,6 @@
   :config
   (setq which-key-idle-delay 0.3))
 
-;; Modern UI & Performance
-(use-package dashboard
-  :defer t
-  :config
-  (dashboard-setup-startup-hook))
-
 (use-package nerd-icons
   :defer t)
 
@@ -122,5 +116,7 @@
 (use-package org-present :defer t)
 (use-package org-tree-slide :defer t)
 (use-package org-appear :defer t)
+
+
 
 (provide 'init-packages)

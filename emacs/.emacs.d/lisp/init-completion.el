@@ -112,8 +112,10 @@
                '(basic-remote           ; Name of `completion-style'
                  kb/basic-remote-try-completion kb/basic-remote-all-completions nil))
   :config
-  (vertico-mode)
-  ;; Extensions
+    (vertico-mode)
+  ;; Extensions - explicitly load them to avoid autoload issues on startup
+  (require 'vertico-repeat)
+  (require 'vertico-directory)
   (vertico-multiform-mode)
 
   ;; Prefix the current candidate with “» ”. From
