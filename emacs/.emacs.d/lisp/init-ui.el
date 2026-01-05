@@ -94,7 +94,6 @@
 ;;   (doom-themes-org-config))
 
 (use-package doom-themes
-  :defer t
   :hook (after-init . (lambda ()
                         (setq doom-themes-enable-bold t
                               doom-themes-enable-italic t)
@@ -207,16 +206,16 @@
 
 (remove-hook 'find-file-hooks 'vc-refresh-state)
 
-(use-package dashboard
-  :ensure t
-  :config
+;; (use-package dashboard
+;;   :ensure t
+;;   :config
 
-  (setq dashboard-startup-banner 'logo)
-  (setq dashboard-display-icons-p 't)     ; display icons on both GUI and terminal
-  (setq dashboard-icon-type 'nerd-icons) ; use `nerd-icons' package
-  (setq dashboard-set-heading-icons 't)
-  (setq dashboard-set-file-icons 't)
+;;   (setq dashboard-startup-banner 'logo)
+;;   (setq dashboard-display-icons-p 't)     ; display icons on both GUI and terminal
+;;   (setq dashboard-icon-type 'nerd-icons) ; use `nerd-icons' package
+;;   (setq dashboard-set-heading-icons 't)
+;;   (setq dashboard-set-file-icons 't)
 
-  (dashboard-setup-startup-hook))
+;;   (dashboard-setup-startup-hook))
 
 (provide 'init-ui)

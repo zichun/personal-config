@@ -117,6 +117,11 @@
 (use-package org-tree-slide :defer t)
 (use-package org-appear :defer t)
 
+(use-package exec-path-from-shell
+  :demand t
+  :if (memq window-system '(mac ns))
+  :config
+  (exec-path-from-shell-initialize))
 
 
 (provide 'init-packages)

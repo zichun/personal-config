@@ -19,6 +19,8 @@
 (when window-system
   (server-start))
 
+(desktop-save-mode 1)
+
 (require 'init-packages)
 (require 'init-ui)
 (require 'init-completion)
@@ -62,9 +64,14 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("ee0785c299c1d228ed30cf278aab82cf1fa05a2dc122e425044e758203f097d2"
+     "993aac313027a1d6e70d45b98e121492c1b00a0daa5a8629788ed7d523fe62c1"
+     default))
  '(package-vc-selected-packages
    '((copilot :url "https://github.com/copilot-emacs/copilot.el" :branch
-              "main"))))
+              "main")))
+ '(warning-suppress-log-types '((straight package))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

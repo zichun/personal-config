@@ -55,6 +55,7 @@
   (flyover-text-tint-percent 50)
 
   ;; Display settings
+  (flyover-display-mode 'always)
   (flyover-hide-checker-name t)
   (flyover-show-virtual-line t)
   (flyover-virtual-line-type 'curved-dotted-arrow)
