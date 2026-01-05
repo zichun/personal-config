@@ -96,7 +96,7 @@ AMOUNT is a percentage to darken (default 10)."
   (cond
 
    ((eq system-type 'darwin)
-    (setq org-directory "org")
+    (setq org-directory "~/org")
     (setq org-default-notes-file (concat org-directory "/journal.org"))
     (setq org-default-journal-file (concat org-directory "/journal.org"))
     (setq org-agenda-files (list (symbol-value 'org-default-journal-file)))

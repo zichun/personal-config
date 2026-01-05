@@ -1,4 +1,4 @@
-$env:RIPGREP_CONFIG_PATH = "$($env:USERPROFILE)\.ripgreprc";
+$env:RIPGREP_CONFIG_PATH = "$($env:HOME)/.ripgreprc";
 $Script:ProfileInitialized = $false;
 
 function Initialize-Profile {
@@ -137,7 +137,17 @@ public class WinAp {
             emacsclientw.exe -n --no-wait --alternate-editor="runemacs.exe" -e '';
         }
     } else {
-        & '/usr/bin/emacs' $p1 $p2 $p3 $p4;
+        if (Test-Path '/usr/bin/emacs') {
+            & '/usr/bin/emacs' $p1 $p2 $p3 $p4;
+        } elseif (Test-Path '/usr/local/bin/emacs') {
+            if (Get-Process Emacs* -ErrorAction SilentlyContinue) {
+                & '/usr/local/bin/emacsclient' $p1 $p2 $p3 $p4;
+            } else {
+                & '/usr/local/bin/emacs' $p1 $p2 $p3 $p4 &;
+            }
+        } else {
+            Write-Warning 'Cannot find emacs';
+        }
     }
 }
 
