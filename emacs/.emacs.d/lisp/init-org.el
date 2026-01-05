@@ -25,7 +25,7 @@ AMOUNT is a percentage to darken (default 10)."
   (set-face-attribute 'org-column nil :background 'unspecified)
   (set-face-attribute 'org-column-title nil :background 'unspecified)
 
-  (set-face-attribute 'org-document-title nil :font "Consolas" :weight 'bold :height 1.3)
+  (set-face-attribute 'org-document-title nil :font "Hack" :weight 'bold :height 1.3)
   ;; Modern Org UI
   (global-org-modern-mode)
   (org-indent-mode)
@@ -54,7 +54,7 @@ AMOUNT is a percentage to darken (default 10)."
    org-agenda-tags-column 0
    org-ellipsis "…")
 
-  (set-face-attribute 'org-document-title nil :font "Consolas" :weight 'bold :height 1.3)
+  (set-face-attribute 'org-document-title nil :font "Hack" :weight 'bold :height 1.3)
 
   ;; Customize Org Block to have a distinct background and left border
   (custom-theme-set-faces
@@ -80,7 +80,10 @@ AMOUNT is a percentage to darken (default 10)."
                                   ("c"   . font-lock-type-face)
                                   ("c++" . font-lock-type-face)
                                   ("cpp" . font-lock-type-face)
-                                  ("powershell" . font-lock-builtin-face))
+                                  ("powershell" . font-lock-builtin-face)
+                                  ("bash" . font-lock-builtin-face)
+                                  ("pwsh" . font-lock-builtin-face)
+                                  ("sh" . font-lock-builtin-face))
    )
   (hotsauce-mode)
   )
@@ -89,44 +92,63 @@ AMOUNT is a percentage to darken (default 10)."
   :defer t
   :hook (org-mode . zc/org-mode-setup)
   :config
-  (setq org-directory "~/Sync/org")
-  (setq org-default-notes-file (concat org-directory "/journal.org"))
-  (setq org-default-journal-file (concat org-directory "/journal.org"))
-  (setq org-default-todo-file (concat org-directory "/todo.org"))
-  (setq org-default-personal-file (concat org-directory "/personal.org"))
-  (setq org-fold-catch-invisible-edits 'show-and-error)
 
-  (setq org-agenda-files (list (symbol-value 'org-default-journal-file)))
+  (cond
 
-  (setq org-capture-templates
-        '(    ;; ... other templates
-          ("t" "Todo"
-           entry
-           (file+headline org-default-todo-file "Tasks") "* TODO %?\n %i\n %a")
+   ((eq system-type 'darwin)
+    (setq org-directory "org")
+    (setq org-default-notes-file (concat org-directory "/journal.org"))
+    (setq org-default-journal-file (concat org-directory "/journal.org"))
+    (setq org-agenda-files (list (symbol-value 'org-default-journal-file)))
+    (setq org-capture-templates
+          '(    ;; ... other templates
+            ("j" "Journal Entry"
+             entry
+             (file+datetree org-default-journal-file)
+             "* %?"
+             :empty-lines 1)))
+    )
 
-          ("j" "Journal Entry"
-           entry
-           (file+datetree org-default-journal-file)
-           "* %?"
-           :empty-lines 1)
+   ((eq system-type 'windows-nt)
+    (setq org-directory "~/Sync/org")
+    (setq org-default-notes-file (concat org-directory "/journal.org"))
+    (setq org-default-journal-file (concat org-directory "/journal.org"))
+    (setq org-default-todo-file (concat org-directory "/todo.org"))
+    (setq org-default-personal-file (concat org-directory "/personal.org"))
+    (setq org-fold-catch-invisible-edits 'show-and-error)
 
-          ("p" "Personal Notes"
-           entry
-           (file+datetree org-default-personal-file)
-           "* %?"
-           :empty-lines 1)
+    (setq org-agenda-files (list (symbol-value 'org-default-journal-file)))
 
-          ;; New Incident template
-          ("i" "Incident"
-           entry
-           (file+datetree (lambda ()
-                            (let ((incident-number (read-string "Incident number: ")))
-                              (setq org-capture-incident-number incident-number) ; store temporarily
-                              (expand-file-name (format "icm/%s.org" incident-number) org-directory))))
-           "* Incident [[https://portal.microsofticm.com/imp/v5/incidents/details/%(identity org-capture-incident-number)/summary][%(identity org-capture-incident-number)]]\n\n%?\n"
-           :empty-lines 1)
+    (setq org-capture-templates
+          '(    ;; ... other templates
+            ("t" "Todo"
+             entry
+             (file+headline org-default-todo-file "Tasks") "* TODO %?\n %i\n %a")
 
-          ))
+            ("j" "Journal Entry"
+             entry
+             (file+datetree org-default-journal-file)
+             "* %?"
+             :empty-lines 1)
+
+            ("p" "Personal Notes"
+             entry
+             (file+datetree org-default-personal-file)
+             "* %?"
+             :empty-lines 1)
+
+            ;; New Incident template
+            ("i" "Incident"
+             entry
+             (file+datetree (lambda ()
+                              (let ((incident-number (read-string "Incident number: ")))
+                                (setq org-capture-incident-number incident-number) ; store temporarily
+                                (expand-file-name (format "icm/%s.org" incident-number) org-directory))))
+             "* Incident [[https://portal.microsofticm.com/imp/v5/incidents/details/%(identity org-capture-incident-number)/summary][%(identity org-capture-incident-number)]]\n\n%?\n"
+             :empty-lines 1)
+
+            ))
+    ))
 
   ;; Enable inline highlighting for codeblocks
   (setq org-src-fontify-natively t)

@@ -43,9 +43,12 @@
 
 (set-face-attribute 'default nil :height 125)
 (when window-system
-  (if (string-equal system-type "windows-nt")
-      (set-face-attribute 'default nil :font "Cascadia Code")
-    (set-face-attribute 'default nil :font "Hack"))
+  (cond ((eq system-type 'darwin)
+         (set-face-attribute 'default nil :font "SF Mono"))
+        ((eq system-type 'windows-nt)
+         (set-face-attribute 'default nil :font "Cascadia Code"))
+        (t
+         (set-face-attribute 'default nil :font "Hack")))
   (setq-default line-spacing 3))
 
 (use-package doom-modeline
