@@ -20,7 +20,7 @@
 
 (use-package vertico
   :demand t
-  :straight (vertico :files (:defaults "extensions\\*") ; Special recipe to load extensions conveniently
+  :straight (vertico :files (:defaults "extensions/*") ; Special recipe to load extensions conveniently
                      :includes (vertico-indexed
                                 vertico-flat
                                 vertico-grid
