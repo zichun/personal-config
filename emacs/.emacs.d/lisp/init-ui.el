@@ -48,7 +48,7 @@
         ((eq system-type 'windows-nt)
          (set-face-attribute 'default nil :font "Cascadia Code"))
         (t
-         (set-face-attribute 'default nil :font "Hack")))
+         (set-face-attribute 'default nil :font "Monospace")))
   (setq-default line-spacing 3))
 
 (use-package doom-modeline

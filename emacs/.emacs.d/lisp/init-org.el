@@ -77,6 +77,7 @@ AMOUNT is a percentage to darken (default 10)."
    hotsauce-margin-width 4
    hotsauce-secondary-bar-color-fn (lambda () (my-theme-darker-bg 16))
    hotsauce-language-face-alist '(("rust" . font-lock-keyword-face)
+                                  ("python" . font-lock-keyword-face)
                                   ("c"   . font-lock-type-face)
                                   ("c++" . font-lock-type-face)
                                   ("cpp" . font-lock-type-face)
