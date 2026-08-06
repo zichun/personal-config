@@ -1,76 +1,41 @@
 (require 'org)
 (require 'org-tempo)
-
-(use-package org-modern
-  :defer t)
-  ;; This enables the vertical line in the fringe for blocks
-  ;; Optional: Hides the "Source Block" text for a cleaner look
-
 (require 'color)
+(require 'hotsauce-mode)
+
 (defun my-theme-darker-bg (&optional amount)
   "Return a darker version of the current theme background.
 AMOUNT is a percentage to darken (default 10)."
   (let* ((bg (face-background 'default nil t))
          (amt (or amount 10)))
-    (when bg
+    (when (and bg (stringp bg) (not (string-equal bg "unspecified")))
       (color-darken-name bg amt))))
 
-(require 'hotsauce-mode)
+(defun zc/update-org-block-faces ()
+  "Update Org code block background faces based on current theme."
+  (custom-theme-set-faces
+   'user
+   `(org-block
+     ((t (:background ,(my-theme-darker-bg 1000)
+                      :height 0.9
+                      :extend t))))
+   `(org-block-begin-line
+     ((t (:background ,(my-theme-darker-bg -240)
+                      :height 1.2
+                      :extend t))))
+   `(org-block-end-line
+     ((t (:background ,(my-theme-darker-bg -120)
+                      :height 0.8
+                      :extend t))))))
 
 (defun zc/org-mode-setup ()
   (auto-fill-mode 0)
   (visual-line-mode 1)
-
-  ;; Get rid of the background on column views
   (set-face-attribute 'org-column nil :background 'unspecified)
   (set-face-attribute 'org-column-title nil :background 'unspecified)
 
-  (set-face-attribute 'org-document-title nil :font "Hack" :weight 'bold :height 1.3)
-  ;; Modern Org UI
-  (global-org-modern-mode)
-  (org-indent-mode)
-
-  ;; Disable element cache to prevent parser errors in large files
-  (setq org-element-use-cache nil)
-
-  (setq
-   ;; Edit settings
-   org-startup-indented t
-   org-auto-align-tags nil
-   org-tags-column 0
-   org-catch-invisible-edits 'show-and-error
-   org-special-ctrl-a/e t
-   org-insert-heading-respect-content t
-   org-modern-keyword nil
-   org-modern-block-fringe 10
-   org-modern-hide-stars nil
-   org-modern-table nil
-   org-modern-list '(;; (?- . "-")
-                     (?* . "•")
-                     (?+ . "‣"))
-   ;; Org styling, hide markup etc.
-   org-hide-emphasis-markers t
-   org-pretty-entities t
-   org-agenda-tags-column 0
-   org-ellipsis "…")
-
-  (set-face-attribute 'org-document-title nil :font "Hack" :weight 'bold :height 1.3)
-
-  ;; Customize Org Block to have a distinct background and left border
-  (custom-theme-set-faces
-   'user
-   `(org-block
-     ((t (:background ,(my-theme-darker-bg 8)
-                      :height 0.9
-                      :extend t))))
-   `(org-block-begin-line
-     ((t (:background ,(my-theme-darker-bg 20)
-                      :height 1.1
-                      :extend t))))
-   `(org-block-end-line
-     ((t (:background ,(my-theme-darker-bg 20)
-                      :height 0.9
-                      :extend t)))))
+  ;; Update block background according to active dark/light theme
+  (zc/update-org-block-faces)
 
   ;; hotsauce-mode (src-block colorization)
   (setq
@@ -83,31 +48,70 @@ AMOUNT is a percentage to darken (default 10)."
                                   ("powershell" . font-lock-builtin-face)
                                   ("bash" . font-lock-builtin-face)
                                   ("pwsh" . font-lock-builtin-face)
-                                  ("sh" . font-lock-builtin-face))
-   )
-  (hotsauce-mode)
-  )
+                                  ("sh" . font-lock-builtin-face)))
+  (hotsauce-mode 1))
+
+(use-package org-modern
+  :defer t
+  :custom
+  (org-modern-keyword t)
+  (org-modern-checkbox '((?X . "󰄬") (?- . "󰅂") (?\s . " ")))
+  (org-modern-table t)
+  (org-modern-block-name t)
+  (org-modern-block-fringe 4)
+  (org-modern-star '("◉" "○" "✸" "✿" "✤" "✜"))
+  (org-modern-list '((?* . "•") (?+ . "‣") (?- . "–")))
+  (org-modern-tag t)
+  (org-modern-priority t)
+  (org-modern-todo t)
+  :init
+  (global-org-modern-mode 1))
 
 (use-package org
   :defer t
   :hook (org-mode . zc/org-mode-setup)
+  :custom
+  ;; Fix underscore subscripting: require explicit curly braces e.g. foo_{bar}
+  ;; so plain foo_bar will NOT subscript "bar".
+  (org-use-sub-superscripts '{})
+  (org-export-with-sub-superscripts '{})
+
+  ;; Core Org UI & Behavior
+  (org-startup-indented t)
+  (org-auto-align-tags nil)
+  (org-tags-column 0)
+  (org-agenda-tags-column 0)
+  (org-catch-invisible-edits 'show-and-error)
+  (org-special-ctrl-a/e t)
+  (org-insert-heading-respect-content t)
+  (org-hide-emphasis-markers t)
+  (org-pretty-entities t)
+  (org-ellipsis "…")
+
+  ;; Code blocks & Source formatting
+  (org-src-fontify-natively t)
+  (org-fontify-quote-and-verse-blocks t)
+  (org-src-tab-acts-natively t)
+  (org-edit-src-content-indentation 2)
+  (org-src-preserve-indentation nil)
+  (org-list-description-max-indent 5)
+  (org-adapt-indentation nil)
+  (org-fontify-whole-heading-line t)
+  (org-fontify-done-headline t)
   :config
 
   (cond
-
    ((eq system-type 'darwin)
     (setq org-directory "~/org")
     (setq org-default-notes-file (concat org-directory "/journal.org"))
     (setq org-default-journal-file (concat org-directory "/journal.org"))
     (setq org-agenda-files (list (symbol-value 'org-default-journal-file)))
     (setq org-capture-templates
-          '(    ;; ... other templates
-            ("j" "Journal Entry"
+          '(("j" "Journal Entry"
              entry
              (file+datetree org-default-journal-file)
              "* %?"
-             :empty-lines 1)))
-    )
+             :empty-lines 1))))
 
    ((eq system-type 'windows-nt)
     (setq org-directory "~/Sync/org")
@@ -116,76 +120,47 @@ AMOUNT is a percentage to darken (default 10)."
     (setq org-default-todo-file (concat org-directory "/todo.org"))
     (setq org-default-personal-file (concat org-directory "/personal.org"))
     (setq org-fold-catch-invisible-edits 'show-and-error)
-
     (setq org-agenda-files (list (symbol-value 'org-default-journal-file)))
-
     (setq org-capture-templates
-          '(    ;; ... other templates
-            ("t" "Todo"
+          '(("t" "Todo"
              entry
              (file+headline org-default-todo-file "Tasks") "* TODO %?\n %i\n %a")
-
             ("j" "Journal Entry"
              entry
              (file+datetree org-default-journal-file)
              "* %?"
              :empty-lines 1)
-
             ("p" "Personal Notes"
              entry
              (file+datetree org-default-personal-file)
              "* %?"
              :empty-lines 1)
-
-            ;; New Incident template
             ("i" "Incident"
              entry
              (file+datetree (lambda ()
                               (let ((incident-number (read-string "Incident number: ")))
-                                (setq org-capture-incident-number incident-number) ; store temporarily
+                                (setq org-capture-incident-number incident-number)
                                 (expand-file-name (format "icm/%s.org" incident-number) org-directory))))
              "* Incident [[https://portal.microsofticm.com/imp/v5/incidents/details/%(identity org-capture-incident-number)/summary][%(identity org-capture-incident-number)]]\n\n%?\n"
-             :empty-lines 1)
+             :empty-lines 1))))))
 
-            ))
-    ))
+(use-package org-appear
+  :defer t
+  :hook (org-mode . org-appear-mode)
+  :custom
+  (org-appear-autoemphasis t)
+  (org-appear-autosubmarkers t)
+  (org-appear-autolinks t))
 
-  ;; Enable inline highlighting for codeblocks
-  (setq org-src-fontify-natively t)
-  (setq org-fontify-quote-and-verse-blocks t)
-  (setq org-src-tab-acts-natively t)
-  (setq org-edit-src-content-indentation 2)
-  (setq org-src-preserve-indentation nil)
-  ;; set maximum indentation for description lists
-  (setq org-list-description-max-indent 5)
-  ;; prevent demoting heading also shifting text inside sections
-  (setq org-adapt-indentation nil)
-  ;; Hide emphasis char
-  (setq org-hide-emphasis-markers t)
+(with-eval-after-load 'org
+  ;; Heading typography: set ONLY height & weight so theme foreground colors remain intact!
+  (set-face-attribute 'org-document-title nil :height 1.4 :weight 'bold)
+  (set-face-attribute 'org-level-1 nil :height 1.35 :weight 'bold)
+  (set-face-attribute 'org-level-2 nil :height 1.2 :weight 'bold)
+  (set-face-attribute 'org-level-3 nil :height 1.1 :weight 'bold)
+  (set-face-attribute 'org-level-4 nil :height 1.05 :weight 'bold)
+  (set-face-attribute 'org-level-5 nil :height 1.0 :weight 'bold))
 
-  ;; Enable org-appear for auto-toggling marks
-  (add-hook 'org-mode-hook 'org-appear-mode)
-  (setq org-appear-autoemphasis t
-        org-appear-autosubmarkers t
-        org-appear-autolinks t)
-
-  ;; whole heading line is fontified
-  (setq org-fontify-whole-heading-line t
-        org-fontify-done-headline t
-        org-fontify-quote-and-verse-blocks t)
-
-  ;; Use org-modern for bullet-point niceness (already enabled via global-org-modern-mode)
-  (add-to-list 'org-emphasis-alist
-               '("*" (:inherit font-lock-warning-face :height 1.8 :weight bold)))
-
-  (add-to-list 'org-emphasis-alist
-               '("/" (:inherit font-lock-type-face :slant italic :height 145)))
-
-  (add-to-list 'org-emphasis-alist
-               '("_" (:inherit font-lock-function-name-face :height 145 :underline t)))
-
-  (add-to-list 'org-emphasis-alist
-               '("~" (:inherit font-lock-string-face))))
 
 (with-eval-after-load 'org
   (bind-key "\C-c l" 'org-store-link)
