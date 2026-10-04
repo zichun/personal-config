@@ -118,7 +118,7 @@ AMOUNT is a percentage to darken (default 10)."
              :empty-lines 1))))
 
    ((eq system-type 'windows-nt)
-    (setq org-directory "~/Sync/org")
+    (setq org-directory "~/org")
     (setq org-default-notes-file (concat org-directory "/journal.org"))
     (setq org-default-journal-file (concat org-directory "/journal.org"))
     (setq org-default-todo-file (concat org-directory "/todo.org"))
@@ -275,7 +275,7 @@ This function is intended to be run from a `kill-buffer-hook`."
 
 (defun org-babel-execute:mermaid (body params)
   (let* ((out-file
-          (or (expand-file-name (concat "~/Sync/org/"
+          (or (expand-file-name (concat "~/org/"
                                         (cdr (assoc :file params))))
               (error "mermaid requires a \":file\" header argument")))
 	 (theme (cdr (assoc :theme params)))
