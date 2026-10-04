@@ -1,3 +1,4 @@
+;;  -*- lexical-binding: t; -*-
 (remove-hook 'c++-mode-hook 'flycheck-mode)
 (provide 'init-language-cpp)
 

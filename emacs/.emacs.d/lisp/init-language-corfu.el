@@ -1,3 +1,4 @@
+;;  -*- lexical-binding: t; -*-
 ;; https://kristofferbalintona.me/posts/202202270056/
 ;; Modern completion-at-point using Corfu
 ;; This replaces company-mode for in-buffer completion

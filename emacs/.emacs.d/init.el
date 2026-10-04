@@ -1,3 +1,4 @@
+;;  -*- lexical-binding: t; -*-
 (defvar native-comp-deferred-compilation-deny-list nil)
 
 ;; Package initialization is handled by init-packages.el (using straight.el)

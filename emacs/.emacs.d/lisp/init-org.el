@@ -1,6 +1,9 @@
+;;  -*- lexical-binding: t; -*-
 (require 'org)
+(require 'org-element)
 (require 'org-tempo)
 (require 'color)
+(require 'cl-lib)
 (require 'hotsauce-mode)
 
 (defun my-theme-darker-bg (&optional amount)
@@ -160,7 +163,37 @@ AMOUNT is a percentage to darken (default 10)."
   (set-face-attribute 'org-level-2 nil :height 1.2 :weight 'bold)
   (set-face-attribute 'org-level-3 nil :height 1.1 :weight 'bold)
   (set-face-attribute 'org-level-4 nil :height 1.05 :weight 'bold)
-  (set-face-attribute 'org-level-5 nil :height 1.0 :weight 'bold))
+  (set-face-attribute 'org-level-5 nil :height 1.0 :weight 'bold)
+
+  ;; Custom emphasis faces
+  (defface org-bold
+    '((((class color) (min-colors 88) (background dark))
+       :foreground "#e5a044" :weight bold :height 1.1)
+      (((class color) (min-colors 88) (background light))
+       :foreground "#c94f1c" :weight bold :height 1.1)
+      (t :weight bold :height 1.1))
+    "Face for Org mode bold emphasis (*text*)."
+    :group 'org-faces)
+
+  (defface org-italica
+    '((((class color) (min-colors 88) (background dark))
+       :foreground "#68b6c8" :slant italic)
+      (((class color) (min-colors 88) (background light))
+       :foreground "#0b7285" :slant italic)
+      (t :slant italic))
+    "Face for Org mode italic emphasis (/text/)."
+    :group 'org-faces)
+
+  ;; Configure emphasis alist including custom faces and backtick (`) markup
+  (setq org-emphasis-alist
+        '(("*" org-bold)
+          ("/" org-italic)
+          ("_" underline)
+          ("=" org-verbatim verbatim)
+          ("~" org-code verbatim)
+          ("`" org-verbatim verbatim)
+          ("+" (:strike-through t))))
+)
 
 
 (with-eval-after-load 'org

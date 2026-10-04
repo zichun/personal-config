@@ -1,3 +1,4 @@
+;;  -*- lexical-binding: t; -*-
 (use-package git-messenger
   :defer t
   :bind ("C-x v p" . git-messenger:popup-message)

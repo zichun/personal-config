@@ -1,3 +1,4 @@
+;;  -*- lexical-binding: t; -*-
 ;; (use-package eglot-booster
 ;;   :vc (:url "https://github.com/jdtsmith/eglot-booster"
 ;;             :rev :newest

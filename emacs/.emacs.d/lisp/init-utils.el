@@ -1,3 +1,4 @@
+;;  -*- lexical-binding: t; -*-
 (defun backward-delete-word (arg)
   "Delete characters backward until encountering the beginning of a word, with argument ARG, do that arg number of times."
   (interactive "p")
