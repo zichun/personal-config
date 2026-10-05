@@ -1,19 +1,22 @@
-;;  -*- lexical-binding: t; -*-
-(defvar native-comp-deferred-compilation-deny-list nil)
+;;; init.el -*- lexical-binding: t; -*-
 
-;; Package initialization is handled by init-packages.el (using straight.el)
-;; (package-initialize) ;; Removed to prevent double-loading warnings with straight.el
+;; Emacs 31 Native Compilation & Process I/O Optimizations
+(setq native-comp-jit-compilation t
+      native-comp-async-report-warnings-errors 'silent)
 
-(setq gc-cons-threshold (* 50 1000 1000))
-;; Reduce background work
-(setq read-process-output-max (* 1024 1024)) ;; 1MB
-;; Make sure process filters don't get stuck
+;; Increase read buffer for faster LSP (Eglot) & external process throughput
+(setq read-process-output-max (* 2 1024 1024)) ;; 2MB
 (setq process-adaptive-read-buffering nil)
-;; Use async processes where possible
+
+;; Use async processes where possible for Eglot
 (when (fboundp 'eglot--async-request)
   (setq eglot-send-changes-idle-time 0.5))
-(setq comp-async-report-warnings-errors nil)
+
 (set-default-coding-systems 'utf-8)
+
+;; Smooth pixel scrolling (built-in Emacs 29+)
+(when (fboundp 'pixel-scroll-precision-mode)
+  (pixel-scroll-precision-mode 1))
 
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 
@@ -22,6 +25,7 @@
 
 (desktop-save-mode 1)
 
+;; Load modular configs
 (require 'init-packages)
 (require 'init-ui)
 (require 'init-completion)
@@ -29,36 +33,31 @@
 (require 'init-tools)
 (require 'init-org)
 (require 'notebook)
-                                        ;(require 'init-magit)
+;; (require 'init-magit)
 
 (require 'init-language-base)
-
 (require 'init-keybindings)
 
-(setq backup-directory-alist '(("." . "~/MyEmacsBackups")))
+;; Backup & Auto-save configuration
 (defvar --backup-directory "~/MyEmacsBackups/")
-(if (not (file-exists-p --backup-directory))
-    (make-directory --backup-directory t))
+(unless (file-exists-p --backup-directory)
+  (make-directory --backup-directory t))
 (setq backup-directory-alist `(("." . ,--backup-directory)))
-(setq auto-save-file-name-transforms
-      `((".*" "~/MyEmacsBackups/" t)))
-(setq make-backup-files t               ; backup of a file the first time it is saved.
+(setq auto-save-file-name-transforms `((".*" ,--backup-directory t)))
+(setq make-backup-files t               ; backup of a file the first time it is saved
       backup-by-copying t               ; don't clobber symlinks
       version-control t                 ; version numbers for backup files
       delete-old-versions t             ; delete excess backup files silently
       delete-by-moving-to-trash t
-      kept-old-versions 3               ; oldest versions to keep when a new numbered backup is made (default: 2)
-      kept-new-versions 3               ; newest versions to keep when a new numbered backup is made (default: 2)
+      kept-old-versions 3               ; oldest versions to keep
+      kept-new-versions 3               ; newest versions to keep
       auto-save-default t               ; auto-save every buffer that visits a file
-      auto-save-timeout 20              ; number of seconds idle time before auto-save (default: 30)
-      auto-save-interval 200            ; number of keystrokes between auto-saves (default: 300)
-      )
+      auto-save-timeout 20              ; idle seconds before auto-save
+      auto-save-interval 200)           ; keystrokes between auto-saves
 
-                                        ; do not check if remote files are readable
+;; Recentf remote handling
 (setq recentf-keep '(file-remote-p file-readable-p))
-(setq recentf-exclude (quote ("Z:\\'")))
-
-                                        ;
+(setq recentf-exclude '("Z:\\'"))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -82,5 +81,3 @@
  )
 
 (provide 'init)
-
-(setq native-comp-deferred-compilation t)

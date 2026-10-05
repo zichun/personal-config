@@ -37,9 +37,6 @@ AMOUNT is a percentage to darken (default 10)."
   (set-face-attribute 'org-column nil :background 'unspecified)
   (set-face-attribute 'org-column-title nil :background 'unspecified)
 
-  ;; Update block background according to active dark/light theme
-  (zc/update-org-block-faces)
-
   ;; hotsauce-mode (src-block colorization)
   (setq
    hotsauce-margin-width 4
@@ -75,13 +72,17 @@ AMOUNT is a percentage to darken (default 10)."
   :defer t
   :hook (org-mode . zc/org-mode-setup)
   :custom
+  ;; CRITICAL PERFORMANCE FIXES FOR LARGE ORG FILES (e.g. journal.org)
+  ;; Disable org-element-cache which causes random multi-second freezes during typing
+  (org-element-use-cache nil)
+  (org-fold-core-style 'text-properties)
+
   ;; Fix underscore subscripting: require explicit curly braces e.g. foo_{bar}
-  ;; so plain foo_bar will NOT subscript "bar".
   (org-use-sub-superscripts '{})
   (org-export-with-sub-superscripts '{})
 
-  ;; Core Org UI & Behavior
-  (org-startup-indented t)
+  ;; Core Org UI & Behavior (org-modern-indent handles indentation)
+  (org-startup-indented nil)
   (org-auto-align-tags nil)
   (org-tags-column 0)
   (org-agenda-tags-column 0)
@@ -103,6 +104,7 @@ AMOUNT is a percentage to darken (default 10)."
   (org-fontify-whole-heading-line t)
   (org-fontify-done-headline t)
   :config
+  (zc/update-org-block-faces)
 
   (cond
    ((eq system-type 'darwin)
@@ -152,8 +154,9 @@ AMOUNT is a percentage to darken (default 10)."
   :defer t
   :hook (org-mode . org-appear-mode)
   :custom
+  (org-appear-delay 0.15)            ; Debounce overlay calculations while typing
   (org-appear-autoemphasis t)
-  (org-appear-autosubmarkers t)
+  (org-appear-autosubmarkers nil)     ; Avoid heavy per-keystroke subscript scanning
   (org-appear-autolinks t))
 
 (with-eval-after-load 'org
@@ -168,33 +171,44 @@ AMOUNT is a percentage to darken (default 10)."
   ;; Custom emphasis faces
   (defface org-bold
     '((((class color) (min-colors 88) (background dark))
-       :foreground "#e5a044" :weight bold :height 1.1)
+       :foreground "#fab005" :weight bold :height 1.15)
       (((class color) (min-colors 88) (background light))
-       :foreground "#c94f1c" :weight bold :height 1.1)
-      (t :weight bold :height 1.1))
-    "Face for Org mode bold emphasis (*text*)."
+       :foreground "#d9480f" :weight bold :height 1.15)
+      (t :weight bold :height 1.15))
+    "Face for Org mode bold emphasis (*text*) with accent color and larger font size."
     :group 'org-faces)
 
   (defface org-italica
     '((((class color) (min-colors 88) (background dark))
-       :foreground "#68b6c8" :slant italic)
+       :foreground "#38d9a9" :slant italic)
       (((class color) (min-colors 88) (background light))
-       :foreground "#0b7285" :slant italic)
+       :foreground "#0c8599" :slant italic)
       (t :slant italic))
-    "Face for Org mode italic emphasis (/text/)."
+    "Face for Org mode italic emphasis (/text/) with distinct accent color."
     :group 'org-faces)
 
-  ;; Configure emphasis alist including custom faces and backtick (`) markup
+  ;; Configure standard Org emphasis alist (keeps org-element-cache and org-appear fast & stable)
   (setq org-emphasis-alist
         '(("*" org-bold)
-          ("/" org-italic)
+          ("/" org-italica)
           ("_" underline)
           ("=" org-verbatim verbatim)
           ("~" org-code verbatim)
-          ("`" org-verbatim verbatim)
           ("+" (:strike-through t))))
-)
 
+  ;; Reset & recompile Org emphasis regular expressions
+  (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components))
+
+;; Fontify backtick `code` snippets with `org-verbatim` face via font-lock (zero lag, no cache conflicts)
+(defun zc/org-add-backtick-markup ()
+  "Fontify `code` snippets with `org-verbatim` face."
+  (font-lock-add-keywords
+   nil
+   '(("\\(?:^\\|[[:blank:]({\\[]\\)\\(`\\([^`\n\r]+?\\)`\\)"
+      (1 'org-verbatim t)))
+   'append))
+
+(add-hook 'org-mode-hook #'zc/org-add-backtick-markup)
 
 (with-eval-after-load 'org
   (bind-key "\C-c l" 'org-store-link)

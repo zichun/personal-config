@@ -1,31 +1,30 @@
-;;  -*- lexical-binding: t; -*-
+;;; init-ui.el -*- lexical-binding: t; -*-
+
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
-(setq-default show-trailing-whitespace 1)
+(setq-default show-trailing-whitespace t)
 
 (column-number-mode 1)
-(setq column-number-mode t)
 (setq line-number-mode t)
 
 (display-time)
 
-(when (fboundp 'tool-bar-mode) (tool-bar-mode 0))
-(when (fboundp 'menu-bar-mode) (menu-bar-mode 0))
-(when (fboundp 'scroll-bar-mode) (scroll-bar-mode 0))
+(when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(when (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+(when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 
-(setq inhibit-startup-message t)
 (setq electric-pair-mode nil) ; disable auto matching of braces
 (setq visible-bell t)
 
 (use-package golden-ratio
   :defer t
-  :hook (window-configuration-change . golden-ratio-mode))
+  :commands (golden-ratio golden-ratio-mode))
 
 (use-package anzu
   :defer t
   :hook (after-init . global-anzu-mode))
 
-;; Line Numbers (display-line-number-mode)
+;; Line Numbers (display-line-numbers-mode)
 (set-fill-column 119)
 (global-display-line-numbers-mode t)
 (dolist (mode '(org-mode-hook
@@ -39,7 +38,7 @@
   :hook (prog-mode . rainbow-delimiters-mode))
 
 ;;
-;; Theme
+;; Font & Theme
 ;;
 
 (set-face-attribute 'default nil :height 125)
@@ -62,9 +61,7 @@
   (doom-modeline-icon t)
   (doom-modeline-major-mode-icon t)
   (doom-modeline-major-mode-color-icon t)
-  ;; Use Nerd Icons
   (doom-modeline-icon (display-graphic-p))
-
   (doom-modeline-minor-modes nil)
   (doom-modeline-enable-word-count nil)
   (doom-modeline-checker-simple-format t)
@@ -90,13 +87,6 @@
   (doom-modeline-irc t)
   (doom-modeline-irc-stylize 'identity))
 
-;; (use-package doom-themes
-;;   :config
-;;   (setq doom-themes-enable-bold t
-;;         doom-themes-enable-italic t)
-;;   (load-theme 'adwaita-dark t)
-;;   (doom-themes-org-config))
-
 (use-package doom-themes
   :hook (after-init . (lambda ()
                         (setq doom-themes-enable-bold t
@@ -105,28 +95,12 @@
                         (doom-themes-org-config))))
 
 ;;
-;; The uniquify library makes it so that when you visit two files with the same name in different directories,
-;; the buffer names have the directory name appended to them instead of the silly hello<2> names you get by default.
-;;
-;(use-package uniquify
-;  :ensure nil  ; Built-in package
-;  :custom
-;  (uniquify-buffer-name-style 'forward))
-
-;;
-;; The saveplace library saves the location of the point when you kill a buffer
-;; and returns to it next time you visit the associated file.
+;; Saveplace
 ;;
 (use-package saveplace
   :ensure nil  ; Built-in package
   :defer t
   :hook (after-init . save-place-mode))
-
-(use-package which-key
-  :defer t
-  :diminish which-key-mode
-  :custom
-  (which-key-idle-delay 0.3))
 
 ;; Treemacs
 (use-package treemacs
@@ -208,18 +182,6 @@
    ("C-x t C-t" . treemacs-find-file)
    ("C-x t M-t" . treemacs-find-tag)))
 
-(remove-hook 'find-file-hooks 'vc-refresh-state)
-
-;; (use-package dashboard
-;;   :ensure t
-;;   :config
-
-;;   (setq dashboard-startup-banner 'logo)
-;;   (setq dashboard-display-icons-p 't)     ; display icons on both GUI and terminal
-;;   (setq dashboard-icon-type 'nerd-icons) ; use `nerd-icons' package
-;;   (setq dashboard-set-heading-icons 't)
-;;   (setq dashboard-set-file-icons 't)
-
-;;   (dashboard-setup-startup-hook))
+(remove-hook 'find-file-hook 'vc-refresh-state)
 
 (provide 'init-ui)

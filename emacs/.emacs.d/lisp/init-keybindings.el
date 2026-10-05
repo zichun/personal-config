@@ -1,38 +1,22 @@
-;;  -*- lexical-binding: t; -*-
-;; Keybindings
-;;
+;;; init-keybindings.el -*- lexical-binding: t; -*-
 
-(global-set-key [C-backspace] 'backward-delete-word)
-(global-set-key (kbd "C-<f5>") 'linum-mode)
-(global-set-key "\M-g" 'goto-line)
-(global-set-key "\M-l" 'copy-current-line-position-to-clipboard)
-(global-set-key (kbd "C-x C-e") 'eval-and-replace)
-(global-set-key '[f9] 'c-beginning-of-defun)
-(global-set-key '[f10] 'c-end-of-defun)
-(global-set-key '[f11] 'copy-region-as-kill)
-(global-set-key '[f12] 'my-copy-c-function)
-(global-set-key (kbd "C-x g") 'magit-status)
+;; Global Keybindings (Emacs 29+ keymap-global-set API)
+(keymap-global-set "C-<backspace>" #'backward-delete-word)
+(keymap-global-set "C-<f5>" #'display-line-numbers-mode)
+(keymap-global-set "M-g" #'goto-line)
+(keymap-global-set "M-l" #'copy-current-line-position-to-clipboard)
+(keymap-global-set "C-x C-e" #'eval-and-replace)
+(keymap-global-set "<f9>" #'c-beginning-of-defun)
+(keymap-global-set "<f10>" #'c-end-of-defun)
+(keymap-global-set "<f11>" #'copy-region-as-kill)
+(keymap-global-set "<f12>" #'my-copy-c-function)
+(keymap-global-set "C-x g" #'magit-status)
 
-;; movements
-(global-set-key (kbd "C-S-n")
-                (lambda ()
-                  (interactive)
-                  (ignore-errors (forward-line 5))))
-
-(global-set-key (kbd "C-S-p")
-                (lambda ()
-                  (interactive)
-                  (ignore-errors (forward-line -5))))
-
-(global-set-key (kbd "C-S-f")
-                (lambda ()
-                  (interactive)
-                  (ignore-errors (forward-char 5))))
-
-(global-set-key (kbd "C-S-b")
-                (lambda ()
-                  (interactive)
-                  (ignore-errors (backward-char 5))))
+;; Fast line & char movements
+(keymap-global-set "C-S-n" (lambda () (interactive) (ignore-errors (forward-line 5))))
+(keymap-global-set "C-S-p" (lambda () (interactive) (ignore-errors (forward-line -5))))
+(keymap-global-set "C-S-f" (lambda () (interactive) (ignore-errors (forward-char 5))))
+(keymap-global-set "C-S-b" (lambda () (interactive) (ignore-errors (backward-char 5))))
 
 (defun my/go-to-next-paren ()
   "Jump to the next closing parenthesis or string quote.
@@ -67,39 +51,18 @@ Otherwise, go backward up a list level."
      (t
       (backward-up-list)))))
 
-(global-set-key (kbd "M-n") 'my/go-to-next-paren)
-(global-set-key (kbd "M-p") 'my/go-to-prev-paren)
+(keymap-global-set "M-n" #'my/go-to-next-paren)
+(keymap-global-set "M-p" #'my/go-to-prev-paren)
 
 ;; Highlight-symbols
-;(global-set-key [(control f1)] 'hl-highlight-mode)
-(global-set-key [(control f2)] 'hl-highlight-thingatpt-local)
-(global-set-key [f2] 'hl-find-next-thing)
-(global-set-key [(shift f2)] 'hl-find-prev-thing)
-;(global-set-key [(meta f2)] 'highlight-symbol-query-replace)
+(keymap-global-set "C-<f2>" #'hl-highlight-thingatpt-local)
+(keymap-global-set "<f2>" #'hl-find-next-thing)
+(keymap-global-set "S-<f2>" #'hl-find-prev-thing)
 
 ;; Highlight2Clipboard
-(global-set-key [(meta f8)]
-                'copy-region-as-richtext-to-clipboard)
+(keymap-global-set "M-<f8>" #'copy-region-as-richtext-to-clipboard)
 
-;; append-line-to-scratch
-(global-set-key (kbd "M-]") 'append-line-to-scratch)
-
-;; Ivy-based replacement for standard commands
-; (global-set-key (kbd "C-s") 'swiper)
-; (global-set-key (kbd "C-r") 'swiper)
-;(global-set-key (kbd "M-x") 'counsel-M-x)
-; (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-;; Ivy-based interface to shell and system tools
-; (global-set-key (kbd "C-c g") 'counsel-git)
-;; Other commands
-;(global-set-key (kbd "C-c C-r") 'ivy-resume)
-;(global-set-key (kbd "C-x C-i") 'counsel-imenu)
-;(global-set-key (kbd "C-c f") #'deadgrep)
-
-;; Swiper
-;(global-set-key (kbd "C-s") 'swiper)
-;(global-set-key (kbd "C-r") 'swiper-backward)
-;; (define-key ivy-minibuffer-map (kbd "C-s") 'ivy-next-line-or-history)
-;; (define-key ivy-minibuffer-map (kbd "C-r") 'ivy-previous-line-or-history)
+;; Append line to scratch
+(keymap-global-set "M-]" #'append-line-to-scratch)
 
 (provide 'init-keybindings)

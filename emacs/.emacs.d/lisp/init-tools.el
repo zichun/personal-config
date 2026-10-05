@@ -1,4 +1,5 @@
-;;  -*- lexical-binding: t; -*-
+;;; init-tools.el -*- lexical-binding: t; -*-
+
 (use-package git-messenger
   :defer t
   :bind ("C-x v p" . git-messenger:popup-message)
@@ -25,22 +26,7 @@
   :bind (("C-=" . er/expand-region)
          ("C--" . er/contract-region)))
 
-;; (use-package multiple-cursors
-;;   :defer t
-;;   :bind
-;;   ("C-S-c C-S-c"   . mc/edit-lines)
-;;   ("C->"   . mc/mark-next-like-this)
-;;   ("C-<"   . mc/mark-previous-like-this)
-;;   ("C-c C-<" . mc/mark-all-like-this))
-
-;; (use-package iedit
-;;   :config
-;;   (set-face-background 'iedit-occurrence "Magenta")
-;;   :bind
-;;   ("C-;" . iedit-mode))
-
-;; shell-pop
-
+;; Shell popup
 (use-package shell-pop
   :defer t
   :bind ("C-t" . shell-pop)
@@ -62,7 +48,6 @@
                              (setq show-trailing-whitespace nil)))
 
 ;; Visual Bookmark - https://github.com/joodland/bm
-
 (use-package bm
   :defer t
   :bind (("<f1>" . bm-next)
@@ -74,13 +59,13 @@
   (bm-buffer-persistence t)
   :config
   ;; Loading and saving bookmarks
-  (add-hook 'after-init-hook 'bm-repository-load)
+  (add-hook 'after-init-hook #'bm-repository-load)
   (add-hook 'kill-buffer-hook #'bm-buffer-save)
-  (add-hook 'kill-emacs-hook #'(lambda nil
-                                 (bm-buffer-save-all)
-                                 (bm-repository-save)))
+  (add-hook 'kill-emacs-hook (lambda ()
+                               (bm-buffer-save-all)
+                               (bm-repository-save)))
   (add-hook 'after-save-hook #'bm-buffer-save)
-  (add-hook 'find-file-hooks #'bm-buffer-restore)
+  (add-hook 'find-file-hook #'bm-buffer-restore)
   (add-hook 'after-revert-hook #'bm-buffer-restore)
   (add-hook 'vc-before-checkin-hook #'bm-buffer-save))
 

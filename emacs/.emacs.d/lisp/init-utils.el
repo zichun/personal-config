@@ -1,4 +1,5 @@
-;;  -*- lexical-binding: t; -*-
+;;; init-utils.el -*- lexical-binding: t; -*-
+
 (defun backward-delete-word (arg)
   "Delete characters backward until encountering the beginning of a word, with argument ARG, do that arg number of times."
   (interactive "p")
@@ -32,23 +33,19 @@
 (defun rotate-windows ()
   "Rotate your windows"
   (interactive)
-  (cond ((not (> (count-windows)1))
+  (cond ((not (> (count-windows) 1))
          (message "You can't rotate a single window!"))
         (t
          (setq i 1)
          (setq numWindows (count-windows))
-         (while  (< i numWindows)
-           (let* (
-                  (w1 (elt (window-list) i))
+         (while (< i numWindows)
+           (let* ((w1 (elt (window-list) i))
                   (w2 (elt (window-list) (+ (% i numWindows) 1)))
-
                   (b1 (window-buffer w1))
                   (b2 (window-buffer w2))
-
                   (s1 (window-start w1))
-                  (s2 (window-start w2))
-                  )
-             (set-window-buffer w1  b2)
+                  (s2 (window-start w2)))
+             (set-window-buffer w1 b2)
              (set-window-buffer w2 b1)
              (set-window-start w1 s2)
              (set-window-start w2 s1)
@@ -61,17 +58,20 @@
   (while (search-forward "\r" nil t)
     (replace-match "")))
 
-;; Keep region when undoing in region
-(defadvice undo-tree-undo (around keep-region activate)
+;; Keep region when undoing in region using modern advice
+(defun kb/undo-tree-undo-keep-region (orig-fun &rest args)
   (if (use-region-p)
       (let ((m (set-marker (make-marker) (mark)))
             (p (set-marker (make-marker) (point))))
-        ad-do-it
+        (apply orig-fun args)
         (goto-char p)
         (set-mark m)
         (set-marker p nil)
         (set-marker m nil))
-    ad-do-it))
+    (apply orig-fun args)))
+
+(with-eval-after-load 'undo-tree
+  (advice-add 'undo-tree-undo :around #'kb/undo-tree-undo-keep-region))
 
 (defun eval-and-replace ()
   "Replace the preceding sexp with its value."
@@ -83,63 +83,16 @@
     (error (message "Invalid expression")
            (insert (current-kill 0)))))
 
-;; (require 'imenu)
+(with-eval-after-load 'multiple-cursors-core
+  (advice-add 'mc/mark-next-like-this :after (lambda (&rest _) (mc/cycle-forward))))
 
-;; (defun ido-imenu ()
-;;   "Update the imenu index and then use ido to select a symbol to navigate to.
-;; Symbols matching the text at point are put first in the completion list."
-;;   (interactive)
-;;   (imenu--make-index-alist)
-;;   (let ((name-and-pos '())
-;;         (symbol-names '()))
-;;     (flet ((addsymbols (symbol-list)
-;;                        (when (listp symbol-list)
-;;                          (dolist (symbol symbol-list)
-;;                            (let ((name nil) (position nil))
-;;                              (cond
-;;                               ((and (listp symbol) (imenu--subalist-p symbol))
-;;                                (addsymbols symbol))
-
-;;                               ((listp symbol)
-;;                                (setq name (car symbol))
-;;                                (setq position (cdr symbol)))
-
-;;                               ((stringp symbol)
-;;                                (setq name symbol)
-;;                                (setq position (get-text-property 1 'org-imenu-marker symbol))))
-
-;;                              (unless (or (null position) (null name))
-;;                                (add-to-list 'symbol-names name)
-;;                                (add-to-list 'name-and-pos (cons name position))))))))
-;;       (addsymbols imenu--index-alist))
-;;     ;; If there are matching symbols at point, put them at the beginning of `symbol-names'.
-;;     (let ((symbol-at-point (thing-at-point 'symbol)))
-;;       (when symbol-at-point
-;;         (let* ((regexp (concat (regexp-quote symbol-at-point) "$"))
-;;                (matching-symbols (delq nil (mapcar (lambda (symbol)
-;;                                                      (if (string-match regexp symbol) symbol))
-;;                                                    symbol-names))))
-;;           (when matching-symbols
-;;             (sort matching-symbols (lambda (a b) (> (length a) (length b))))
-;;             (mapc (lambda (symbol) (setq symbol-names (cons symbol (delete symbol symbol-names))))
-;;                   matching-symbols)))))
-;;     (let* ((selected-symbol (ido-completing-read "Symbol? " symbol-names))
-;;            (position (cdr (assoc selected-symbol name-and-pos))))
-;;       (goto-char position))))
-
-;; (defadvice ido-imenu (before push-mark activate)
-;;   (push-mark))
-
-(defadvice mc/mark-next-like-this (after mark-next-cycle-forward activate)
-  (mc/cycle-forward))
-
-(defun my-copy-c-function()
+(defun my-copy-c-function ()
   (interactive)
   (save-excursion (let ((beg (progn (c-beginning-of-defun) (point)))
                         (end (progn (c-end-of-defun) (point))))
                     (copy-region-as-kill beg end))))
 
-(defun uuidgen-braces()
+(defun uuidgen-braces ()
   (interactive)
   (save-excursion (insert "{")
                   (shell-command "uuidgen.exe" t)
@@ -148,14 +101,14 @@
                   (delete-char 1)
                   (insert "}")))
 
-(defun uuidgen-nobraces()
+(defun uuidgen-nobraces ()
   (interactive)
   (save-excursion (shell-command "uuidgen.exe" t)
                   (exchange-point-and-mark)
                   (backward-char 1)
                   (delete-char 1)))
 
-(defun uuidgen-struct()
+(defun uuidgen-struct ()
   (interactive)
   (save-excursion (save-excursion (shell-command "uuidgen.exe -s" t)
                                   (exchange-point-and-mark)
@@ -171,10 +124,9 @@
                   (forward-char 8)
                   (delete-char 4)
                   (move-end-of-line nil)
-                  (delete-char 2)
-                  ))
+                  (delete-char 2)))
 
-(defun uuidgen-messageid()
+(defun uuidgen-messageid ()
   (interactive)
   (save-excursion (save-excursion (uuidgen-struct))
                   (delete-char 1)
@@ -187,7 +139,7 @@
                   (delete-char 1)
                   (insert ")")))
 
-(defun uuidgen-contractid()
+(defun uuidgen-contractid ()
   (interactive)
   (save-excursion (save-excursion (uuidgen-struct))
                   (delete-char 1)
@@ -200,7 +152,7 @@
                   (delete-char 1)
                   (insert ")")))
 
-(defun uuidgen-parens()
+(defun uuidgen-parens ()
   (interactive)
   (save-excursion (save-excursion (uuidgen-struct))
                   (delete-char 1)
@@ -210,10 +162,9 @@
                   (delete-char 1)
                   (forward-char 46)
                   (delete-char 3)
-                  (insert ")")
-                  ))
+                  (insert ")")))
 
-(defun uuidgen-struct-long()
+(defun uuidgen-struct-long ()
   (interactive)
   (save-excursion (shell-command "uuidgen.exe -s" t)
                   (exchange-point-and-mark)
@@ -221,13 +172,12 @@
                   (delete-char 1)))
 
 (defun copy-current-line-position-to-clipboard ()
-  "Copy current line in file to clipboard as '</path/to/file>:<line-number>'"
+  "Copy current line in file to clipboard as '</path/to/file>::<line-number>'"
   (interactive)
   (let ((path-with-line-number
          (concat (buffer-file-name) "::" (number-to-string (line-number-at-pos)))))
-    (x-select-text path-with-line-number)
     (kill-new path-with-line-number)
-    (message (concat path-with-line-number " copied to clipboard"))))
+    (message "%s copied to clipboard" path-with-line-number)))
 
 (defun copy-region-as-richtext-to-clipboard (beg end)
   "Copy Region as rich text to clipboard"
@@ -251,7 +201,8 @@
       (insert ?\n))))
 
 ;; Enable Hide Show minor mode globally
-(add-hook 'prog-mode-hook 'hs-minor-mode)
+(add-hook 'prog-mode-hook #'hs-minor-mode)
+
 ;; Custom HideShow Function
 (defun toggle-fold ()
   (interactive)
@@ -259,7 +210,7 @@
     (backward-up-list)
     (hs-toggle-hiding)))
 
-(global-set-key [C-tab] 'toggle-fold)
-(global-set-key (kbd "C-.") 'hs-show-all)
+(keymap-global-set "C-<tab>" #'toggle-fold)
+(keymap-global-set "C-." #'hs-show-all)
 
 (provide 'init-utils)

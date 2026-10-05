@@ -1,47 +1,27 @@
-;;  -*- lexical-binding: t; -*-
+;;; init-language-base.el -*- lexical-binding: t; -*-
+
 (use-package powershell
   :defer t
   :mode (("\\.ps1\\'" . powershell-mode)
          ("\\.psm1\\'" . powershell-mode)))
 
-(setq counsel-grep-base-command
-      "rg -i -M 120 --no-heading --line-number --color never '%s' .")
-
-;;
-;; cc-mode c++-mode customize font locking
-;; (global-font-lock-mode t)
-;; (setq font-lock-maximum-decoration 2
-;; 	  font-lock-maximum-size nil)
-;; (setq font-lock-support-mode 'jit-lock-mode)
-;; (setq jit-lock-stealth-time 16
-;;       jit-lock-defer-contextually t
-;;       jit-lock-stealth-nice 0.5)
-;; (setq-default font-lock-multiline t)
-
-;; (use-package treesit-auto
-;;   :demand t
-;;   :custom
-;;   (treesit-auto-install 'prompt)
-;;   :config
-;;   (treesit-auto-add-to-auto-mode-alist '(rust toml c++))
-;;   (global-treesit-auto-mode))
-
+;; Tree-sitter automatic grammar installation and mode remapping
 (use-package treesit-auto
-  :defer t
-  :hook (find-file . treesit-auto-mode)
+  :demand t
   :custom
   (treesit-auto-install 'prompt)
   :config
-  (treesit-auto-add-to-auto-mode-alist '(rust toml c++)))
+  (treesit-auto-add-to-auto-mode-alist 'all)
+  (global-treesit-auto-mode))
 
-;; Use Corfu instead of Company for completion
+;; In-buffer completion using Corfu
 (require 'init-language-corfu)
 
 ;; Language-specific configurations
 (require 'init-language-rust-ts)
 (require 'init-language-web)
 (require 'init-language-cpp)
-;(require 'init-language-copilot)
+;; (require 'init-language-copilot)
 
 (use-package flyover
   :defer t
@@ -65,14 +45,5 @@
   (flyover-virtual-line-icon "─►")
   ;; Performance
   (flyover-debounce-interval 0.1))
-
-;; Ensure Treesit-auto installs grammars
-(use-package treesit-auto
-  :demand t
-  :custom
-  (treesit-auto-install 'prompt)
-  :config
-  (treesit-auto-add-to-auto-mode-alist 'all)
-  (global-treesit-auto-mode))
 
 (provide 'init-language-base)

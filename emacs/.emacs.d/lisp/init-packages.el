@@ -1,4 +1,5 @@
-;;  -*- lexical-binding: t; -*-
+;;; init-packages.el -*- lexical-binding: t; -*-
+
 ;; Bootstrap straight.el
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -16,20 +17,27 @@
 ;; Install Org via straight.el EARLY to ensure we use the latest version
 (straight-use-package 'org)
 
-;; Configure use-package to use straight by default
+;; In Emacs 29+, use-package is built-in. Configure use-package to use straight by default:
+(require 'use-package)
 (setq straight-use-package-by-default t)
-(straight-use-package 'use-package)
 
 ;; Essential packages that need to be loaded early
 (use-package general
   :demand t)
 
-(use-package which-key
-  :demand t
-  :init (which-key-mode)
-  :diminish which-key-mode
-  :config
-  (setq which-key-idle-delay 0.3))
+;; In Emacs 30+, which-key is built-in
+(if (fboundp 'which-key-mode)
+    (progn
+      (setq which-key-idle-delay 0.3)
+      (which-key-mode 1))
+  (use-package which-key
+    :demand t
+    :init (which-key-mode 1)
+    :config (setq which-key-idle-delay 0.3)))
+
+;; Built-in EditorConfig (Emacs 30+)
+(when (fboundp 'editorconfig-mode)
+  (editorconfig-mode 1))
 
 (use-package nerd-icons
   :defer t)
@@ -46,7 +54,7 @@
 
 ;; Completion & Selection (Vertico/Consult are in init-completion)
 
-;; Additional utility packages commonly used
+;; Utility packages
 (use-package gist
   :defer t)
 
@@ -78,9 +86,7 @@
   :config
   (global-flycheck-eglot-mode 1))
 
-;; Language modes are handled in init-language-*.el
-;; but we keep some basics here if not language-specific enough
-
+;; Language modes
 (use-package markdown-mode
   :defer t)
 
@@ -112,8 +118,7 @@
 (use-package vscode-dark-plus-theme :defer t)
 (use-package adwaita-dark-theme :defer t)
 
-;; Org mode packages
-;(use-package org-superstar :defer t)
+;; Org mode presentation packages
 (use-package org-present :defer t)
 (use-package org-tree-slide :defer t)
 (use-package org-appear :defer t)
@@ -123,6 +128,5 @@
   :if (memq window-system '(mac ns))
   :config
   (exec-path-from-shell-initialize))
-
 
 (provide 'init-packages)
