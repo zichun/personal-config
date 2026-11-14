@@ -12,12 +12,8 @@
 
 (use-package nerd-icons-completion
   :defer t
-  :config
-  (nerd-icons-completion-mode)
-  :hook
-  (marginalia-mode . nerd-icons-completion-marginalia-setup)
-  :init
-  (nerd-icons-completion-mode))
+  :hook ((marginalia-mode . nerd-icons-completion-mode)
+         (marginalia-mode . nerd-icons-completion-marginalia-setup)))
 
 (use-package vertico
   :demand t

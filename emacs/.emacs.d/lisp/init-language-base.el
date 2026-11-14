@@ -11,6 +11,44 @@
   :custom
   (treesit-auto-install 'prompt)
   :config
+  (defvar zc/treesit-auto--cached-remap 'uninitialized)
+  (defvar zc/treesit-auto--cached-langs nil)
+
+  (defun zc/treesit-auto--installed-langs ()
+    "Return list of tree-sitter language symbols with grammars on disk."
+    (let ((dirs (delq nil (delete-dups
+                           (append (list (expand-file-name "tree-sitter" user-emacs-directory))
+                                   (bound-and-true-p treesit-extra-load-path)))))
+          (langs nil))
+      (dolist (dir dirs langs)
+        (when (file-directory-p dir)
+          (dolist (file (directory-files dir nil "\\`libtree-sitter-.*\\.\\(dll\\|so\\|dylib\\)\\'"))
+            (when (string-match "\\`libtree-sitter-\\(.+\\)\\.\\(?:dll\\|so\\|dylib\\)\\'" file)
+              (push (intern (match-string 1 file)) langs)))))))
+
+  (defun zc/treesit-auto--fast-build-remap (&rest _)
+    "Cached replacement for `treesit-auto--build-major-mode-remap-alist'.
+Avoids probing 57 missing DLLs on disk on every `set-auto-mode' call."
+    (when (or (eq zc/treesit-auto--cached-remap 'uninitialized)
+              (not (equal zc/treesit-auto--cached-langs treesit-auto-langs)))
+      (let* ((installed (zc/treesit-auto--installed-langs))
+             (remap-alist nil))
+        (dolist (recipe (treesit-auto--selected-recipes))
+          (let ((lang (treesit-auto-recipe-lang recipe))
+                (ts-mode (treesit-auto-recipe-ts-mode recipe)))
+            (when (and (or (null installed) (memq lang installed))
+                       (treesit-auto--ready-p ts-mode))
+              (dolist (remap (ensure-list (treesit-auto-recipe-remap recipe)))
+                (push (cons remap ts-mode) remap-alist)))))
+        (setq zc/treesit-auto--cached-langs (copy-sequence treesit-auto-langs)
+              zc/treesit-auto--cached-remap remap-alist)))
+    (append (default-value 'major-mode-remap-alist) zc/treesit-auto--cached-remap))
+
+  (advice-add #'treesit-auto--build-major-mode-remap-alist :override #'zc/treesit-auto--fast-build-remap)
+  (advice-add #'treesit-install-language-grammar :after
+              (lambda (&rest _)
+                (setq zc/treesit-auto--cached-remap 'uninitialized)))
+
   (treesit-auto-add-to-auto-mode-alist 'all)
   (global-treesit-auto-mode))
 

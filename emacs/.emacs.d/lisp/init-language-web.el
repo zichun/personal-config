@@ -1,5 +1,6 @@
 ;;  -*- lexical-binding: t; -*-
 (use-package typescript-ts-mode
+  :ensure nil
   :mode (("\\.ts\\'" . typescript-ts-mode)
          ("\\.tsx\\'" . tsx-ts-mode))
   :hook ((typescript-ts-mode . eglot-ensure)
@@ -10,11 +11,13 @@
   (typescript-ts-mode-indent-offset 2))
 
 (use-package js
+  :ensure nil
   :mode (("\\.js\\'" . js-ts-mode)
          ("\\.jsx\\'" . js-ts-mode))
   :hook (js-ts-mode . eglot-ensure))
 
 (use-package json-ts-mode
+  :ensure nil
   :mode "\\.json\\'"
   :hook (json-ts-mode . flycheck-mode))
 

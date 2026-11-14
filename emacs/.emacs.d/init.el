@@ -16,12 +16,76 @@
 
 ;; Smooth pixel scrolling (built-in Emacs 29+)
 (when (fboundp 'pixel-scroll-precision-mode)
-  (pixel-scroll-precision-mode 1))
+  (add-hook 'after-init-hook #'pixel-scroll-precision-mode))
 
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 
 (when window-system
-  (server-start))
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (require 'server)
+              (when (eq system-type 'windows-nt)
+                (setq server-use-tcp t))
+              (condition-case err
+                  (unless (server-running-p)
+                    (server-start))
+                (error (message "Emacs server failed to start: %s" (error-message-string err)))))))
+
+;; Work around Neomacs Windows `group-name' throwing "Invalid GID specification" instead of returning nil
+(when (and (eq system-type 'windows-nt)
+           (fboundp 'group-name)
+           (condition-case err
+               (progn (group-name 0) nil)
+             (error (equal (error-message-string err) "Invalid GID specification"))))
+  (defun zc/neomacs-safe-group-name (orig gid)
+    "Return nil when `group-name' raises \"Invalid GID specification\" on Windows."
+    (condition-case err
+        (funcall orig gid)
+      (error
+       (if (equal (error-message-string err) "Invalid GID specification")
+           nil
+         (signal (car err) (cdr err))))))
+  (advice-add 'group-name :around #'zc/neomacs-safe-group-name))
+
+;; Only probe Git VC backend (avoids RCS/CVS/SVN/Hg/Bzr checks on every file)
+(setq vc-handled-backends '(Git))
+
+;; Restore top active buffers immediately; load remaining desktop buffers when idle
+(setq desktop-restore-eager 3
+      desktop-lazy-verbose nil
+      desktop-lazy-idle-delay 1)
+
+(defvar zc/desktop-deferred-minor-modes
+  '(flycheck-mode flyover-mode diff-hl-mode anzu-mode corfu-mode)
+  "Minor modes managed by post-startup idle timers rather than eager desktop restore.")
+
+(defvar zc/desktop--reading-p nil)
+(defvar zc/desktop--eager-remaining nil)
+
+(with-eval-after-load 'desktop
+  ;; Avoid saving or eagerly loading minor modes managed by post-startup idle timers
+  (dolist (mode zc/desktop-deferred-minor-modes)
+    (add-to-list 'desktop-minor-mode-table `(,mode nil))
+    (add-to-list 'desktop-minor-mode-handlers `(,mode . ignore)))
+  (advice-add 'desktop-load-file :before-until
+              (lambda (fn) (memq fn zc/desktop-deferred-minor-modes)))
+
+  ;; Enforce `desktop-restore-eager' even when loading an older .emacs.desktop
+  (advice-add 'desktop-read :around
+              (lambda (orig &rest args)
+                (let ((zc/desktop--reading-p t)
+                      (zc/desktop--eager-remaining desktop-restore-eager))
+                  (apply orig args))))
+  (advice-add 'desktop-create-buffer :around
+              (lambda (orig &rest args)
+                (if (and zc/desktop--reading-p
+                         (integerp zc/desktop--eager-remaining))
+                    (if (> zc/desktop--eager-remaining 0)
+                        (progn
+                          (setq zc/desktop--eager-remaining (1- zc/desktop--eager-remaining))
+                          (apply orig args))
+                      (apply #'desktop-append-buffer-args args))
+                  (apply orig args)))))
 
 (desktop-save-mode 1)
 
@@ -32,7 +96,8 @@
 (require 'init-utils)
 (require 'init-tools)
 (require 'init-org)
-(require 'notebook)
+(autoload 'notebook-mode "notebook" "Minor mode for graphical tag as rounded box." t)
+(autoload 'global-notebook-mode "notebook" "Global notebook mode." t)
 ;; (require 'init-magit)
 
 (require 'init-language-base)

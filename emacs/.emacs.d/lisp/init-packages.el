@@ -27,30 +27,36 @@
 
 ;; In Emacs 30+, which-key is built-in
 (if (fboundp 'which-key-mode)
-    (progn
-      (setq which-key-idle-delay 0.3)
-      (which-key-mode 1))
+    (add-hook 'emacs-startup-hook
+              (lambda ()
+                (run-with-idle-timer
+                 0.5 nil
+                 (lambda ()
+                   (setq which-key-idle-delay 0.3)
+                   (which-key-mode 1)))))
   (use-package which-key
-    :demand t
-    :init (which-key-mode 1)
-    :config (setq which-key-idle-delay 0.3)))
+    :defer 1
+    :config
+    (setq which-key-idle-delay 0.3)
+    (which-key-mode 1)))
 
 ;; Built-in EditorConfig (Emacs 30+)
 (when (fboundp 'editorconfig-mode)
-  (editorconfig-mode 1))
+  (add-hook 'after-init-hook #'editorconfig-mode))
 
 (use-package nerd-icons
   :defer t)
 
 (use-package gcmh
-  :demand t
-  :config
-  (gcmh-mode 1))
+  :defer t
+  :hook (emacs-startup . gcmh-mode))
 
 (use-package diff-hl
-  :demand t
-  :config
-  (global-diff-hl-mode))
+  :defer t
+  :init
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (run-with-idle-timer 0.2 nil #'global-diff-hl-mode))))
 
 ;; Completion & Selection (Vertico/Consult are in init-completion)
 
@@ -78,7 +84,12 @@
 
 (use-package flycheck
   :defer t
-  :init (global-flycheck-mode))
+  :custom
+  (flycheck-global-modes '(not org-mode c-mode c++-mode c-ts-mode c++-ts-mode c-or-c++-ts-mode))
+  :init
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (run-with-idle-timer 0.4 nil #'global-flycheck-mode))))
 
 (use-package flycheck-eglot
   :defer t
@@ -96,10 +107,7 @@
 (use-package yasnippet
   :defer t)
 
-;; UI packages (Themes & Modeline)
-(use-package doom-modeline
-  :defer t)
-
+;; UI packages (Themes & Modeline configured in init-ui.el)
 (use-package solaire-mode
   :defer t)
 
@@ -117,11 +125,6 @@
 (use-package badwolf-theme :defer t)
 (use-package vscode-dark-plus-theme :defer t)
 (use-package adwaita-dark-theme :defer t)
-
-;; Org mode presentation packages
-(use-package org-present :defer t)
-(use-package org-tree-slide :defer t)
-(use-package org-appear :defer t)
 
 (use-package exec-path-from-shell
   :demand t

@@ -9,9 +9,9 @@
 
 (display-time)
 
-(when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-(when (fboundp 'menu-bar-mode) (menu-bar-mode -1))
-(when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+(when (bound-and-true-p tool-bar-mode) (tool-bar-mode -1))
+(when (bound-and-true-p menu-bar-mode) (menu-bar-mode -1))
+(when (bound-and-true-p scroll-bar-mode) (scroll-bar-mode -1))
 
 (setq electric-pair-mode nil) ; disable auto matching of braces
 (setq visible-bell t)
@@ -22,7 +22,10 @@
 
 (use-package anzu
   :defer t
-  :hook (after-init . global-anzu-mode))
+  :init
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (run-with-idle-timer 0.6 nil #'global-anzu-mode))))
 
 ;; Line Numbers (display-line-numbers-mode)
 (set-fill-column 119)
@@ -41,14 +44,17 @@
 ;; Font & Theme
 ;;
 
-(set-face-attribute 'default nil :height 125)
+;; Apply font only if early-init's `default-frame-alist' did not already realize it (e.g. Neomacs/TTY)
+(let ((desired-font (pcase system-type
+                      ('darwin "SF Mono")
+                      ('windows-nt "Cascadia Code")
+                      (_ "Monospace"))))
+  (if window-system
+      (unless (equal (face-attribute 'default :family) desired-font)
+        (set-face-attribute 'default nil :font desired-font)
+        (set-face-attribute 'default nil :height 125))
+    (set-face-attribute 'default nil :height 125)))
 (when window-system
-  (cond ((eq system-type 'darwin)
-         (set-face-attribute 'default nil :font "SF Mono"))
-        ((eq system-type 'windows-nt)
-         (set-face-attribute 'default nil :font "Cascadia Code"))
-        (t
-         (set-face-attribute 'default nil :font "Monospace")))
   (setq-default line-spacing 3))
 
 (use-package doom-modeline
@@ -58,7 +64,6 @@
   (doom-modeline-height 25)
   (doom-modeline-bar-width 3)
   (doom-modeline-buffer-file-name-style 'truncate-upto-project)
-  (doom-modeline-icon t)
   (doom-modeline-major-mode-icon t)
   (doom-modeline-major-mode-color-icon t)
   (doom-modeline-icon (display-graphic-p))
@@ -87,12 +92,17 @@
   (doom-modeline-irc t)
   (doom-modeline-irc-stylize 'identity))
 
+(add-to-list 'custom-theme-load-path
+             (expand-file-name "themes" user-emacs-directory))
+(add-hook 'after-init-hook (lambda () (load-theme 'twilight-horizon t)))
+
 (use-package doom-themes
-  :hook (after-init . (lambda ()
-                        (setq doom-themes-enable-bold t
-                              doom-themes-enable-italic t)
-                        (load-theme 'adwaita-dark t)
-                        (doom-themes-org-config))))
+  :defer t
+  :init
+  (with-eval-after-load 'org
+    (setq doom-themes-enable-bold t
+          doom-themes-enable-italic t)
+    (doom-themes-org-config)))
 
 ;;
 ;; Saveplace
@@ -109,7 +119,6 @@
   (with-eval-after-load 'winum
     (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
   :custom
-  (treemacs-collapse-dirs (if (or (executable-find "python3") (executable-find "python")) 3 0))
   (treemacs-deferred-git-apply-delay 0.5)
   (treemacs-directory-name-transformer #'identity)
   (treemacs-display-in-side-window t)
@@ -151,6 +160,7 @@
   (treemacs-width 35)
   (treemacs-workspace-switch-cleanup nil)
   :config
+  (setq treemacs-collapse-dirs (if (or (executable-find "python3") (executable-find "python")) 3 0))
   (dolist (face '(treemacs-root-face
                   treemacs-git-unmodified-face
                   treemacs-git-modified-face
@@ -183,5 +193,11 @@
    ("C-x t M-t" . treemacs-find-tag)))
 
 (remove-hook 'find-file-hook 'vc-refresh-state)
+
+(use-package emacs-everywhere
+  :defer t
+  :config
+  (when (eq system-type 'windows-nt)
+    (load (expand-file-name "lisp/emacs-everywhere-windows" user-emacs-directory))))
 
 (provide 'init-ui)

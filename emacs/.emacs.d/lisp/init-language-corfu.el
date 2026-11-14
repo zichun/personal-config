@@ -39,9 +39,14 @@
   (lsp-completion-provider :none)
 
   :init
-  (global-corfu-mode)
-  (setq corfu-popupinfo-delay 0.5)
-  (corfu-popupinfo-mode)
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (run-with-idle-timer
+               0.1 nil
+               (lambda ()
+                 (global-corfu-mode)
+                 (setq corfu-popupinfo-delay 0.5)
+                 (corfu-popupinfo-mode)))))
   :config
 
   ;; Enable Corfu more generally for every minibuffer, as long as no other

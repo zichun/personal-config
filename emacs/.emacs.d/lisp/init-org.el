@@ -1,35 +1,42 @@
 ;;  -*- lexical-binding: t; -*-
-(require 'org)
-(require 'org-element)
-(require 'org-tempo)
-(require 'color)
-(require 'cl-lib)
-(require 'hotsauce-mode)
+;; Skip loading heavy unused Org modules (ol-gnus, ol-docview, ol-eww, ol-bibtex, etc.)
+(setq org-modules nil)
+
+(autoload 'hotsauce-mode "hotsauce-mode" nil t)
 
 (defun my-theme-darker-bg (&optional amount)
   "Return a darker version of the current theme background.
 AMOUNT is a percentage to darken (default 10)."
+  (require 'color)
   (let* ((bg (face-background 'default nil t))
          (amt (or amount 10)))
-    (when (and bg (stringp bg) (not (string-equal bg "unspecified")))
+    (when (and bg (stringp bg) (color-name-to-rgb bg))
       (color-darken-name bg amt))))
 
-(defun zc/update-org-block-faces ()
+(defun zc/update-org-block-faces (&rest _)
   "Update Org code block background faces based on current theme."
-  (custom-theme-set-faces
-   'user
-   `(org-block
-     ((t (:background ,(my-theme-darker-bg 1000)
-                      :height 0.9
-                      :extend t))))
-   `(org-block-begin-line
-     ((t (:background ,(my-theme-darker-bg -240)
-                      :height 1.2
-                      :extend t))))
-   `(org-block-end-line
-     ((t (:background ,(my-theme-darker-bg -120)
-                      :height 0.8
-                      :extend t))))))
+  (when-let* ((bg-block (my-theme-darker-bg 1000))
+              (bg-begin (my-theme-darker-bg -240))
+              (bg-end (my-theme-darker-bg -120)))
+    (custom-theme-set-faces
+     'user
+     `(org-block
+       ((t (:background ,bg-block
+                        :height 0.9
+                        :extend t))))
+     `(org-block-begin-line
+       ((t (:background ,bg-begin
+                        :height 1.2
+                        :extend t))))
+     `(org-block-end-line
+       ((t (:background ,bg-end
+                        :height 0.8
+                        :extend t)))))))
+
+(with-eval-after-load 'org
+  (if (fboundp 'enable-theme-functions)
+      (add-hook 'enable-theme-functions #'zc/update-org-block-faces)
+    (advice-add 'load-theme :after #'zc/update-org-block-faces)))
 
 (defun zc/org-mode-setup ()
   (auto-fill-mode 0)
@@ -65,8 +72,8 @@ AMOUNT is a percentage to darken (default 10)."
   (org-modern-tag t)
   (org-modern-priority t)
   (org-modern-todo t)
-  :init
-  (global-org-modern-mode 1))
+  :hook ((org-mode . org-modern-mode)
+         (org-agenda-finalize . org-modern-agenda)))
 
 (use-package org
   :defer t
@@ -120,7 +127,7 @@ AMOUNT is a percentage to darken (default 10)."
              :empty-lines 1))))
 
    ((eq system-type 'windows-nt)
-    (setq org-directory "~/org")
+    (setq org-directory "~/Sync/org")
     (setq org-default-notes-file (concat org-directory "/journal.org"))
     (setq org-default-journal-file (concat org-directory "/journal.org"))
     (setq org-default-todo-file (concat org-directory "/todo.org"))
@@ -197,7 +204,11 @@ AMOUNT is a percentage to darken (default 10)."
           ("+" (:strike-through t))))
 
   ;; Reset & recompile Org emphasis regular expressions
-  (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components))
+  (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
+
+  ;; Structure templates (<s TAB) and indentation
+  (require 'org-tempo)
+  (require 'org-indent))
 
 ;; Fontify backtick `code` snippets with `org-verbatim` face via font-lock (zero lag, no cache conflicts)
 (defun zc/org-add-backtick-markup ()
@@ -210,15 +221,16 @@ AMOUNT is a percentage to darken (default 10)."
 
 (add-hook 'org-mode-hook #'zc/org-add-backtick-markup)
 
-(with-eval-after-load 'org
-  (bind-key "\C-c l" 'org-store-link)
-  (bind-key "\C-c a" 'org-agenda)
-  (bind-key "\C-c c" 'org-capture)
-  (bind-key "\C-c b" 'org-iswitchb)
-  (bind-key "\C-c j" 'org-open-journal))
+;; Global Org keybindings (available immediately via autoloads without loading org at startup)
+(bind-key "C-c l" #'org-store-link)
+(bind-key "C-c a" #'org-agenda)
+(bind-key "C-c c" #'org-capture)
+(bind-key "C-c b" #'org-iswitchb)
+(bind-key "C-c j" #'org-open-journal)
 
 (defun org-open-journal()
   (interactive)
+  (require 'org)
   (find-file org-default-journal-file))
 
   ;;(defun org-outlook-open (path) (w32-shell-execute "open" "C:/Program Files (x86)/Microsoft Office/root/Office16/OUTLOOK.exe" (concat "outlook:" path)))
@@ -248,22 +260,9 @@ AMOUNT is a percentage to darken (default 10)."
 ;  (org-superstar-remove-leading-stars t)
 ;  (org-superstar-headline-bullets-list '("‣" "•" "○" "○" "●" "○" "●")))
 
-;; Make sure org-indent face is available
-(require 'org-indent)
-
-;; ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-;; (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-;; (set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
-;; (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-;; (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-;; (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
-;; (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-;; (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-;; (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-;; (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
-
-(require 'ob)
-(require 'ob-eval)
+;; Babel extensions (deferred until Org / Babel loads)
+(with-eval-after-load 'ob
+  (add-to-list 'org-babel-tangle-lang-exts '("Powershell" . "ps")))
 
 (defvar-local my-org-babel-temp-file nil
   "Buffer-local variable to store the path of a temporary babel file.")
@@ -316,8 +315,6 @@ This function is intended to be run from a `kill-buffer-hook`."
     nil))
 
 ;; ob-powershell
-
-(add-to-list 'org-babel-tangle-lang-exts '("Powershell" . "ps"))
 
 (defvar org-babel-default-header-args:powershell '((:lang . "powershell"))
   "A list of default header args for Powershell code blocks.")
@@ -377,8 +374,11 @@ returned as a list."
 
 (use-package ob-rust
   :defer t
-  :if (executable-find "rustc")
-  :init (add-to-list 'org-babel-load-languages '(rust . t)))
+  :after org
+  :init
+  (with-eval-after-load 'ob
+    (when (executable-find "rustc")
+      (add-to-list 'org-babel-load-languages '(rust . t)))))
 
 (defun zc/org-present-prepare-slide ()
   (org-overview)

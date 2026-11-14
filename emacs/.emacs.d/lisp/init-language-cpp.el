@@ -16,12 +16,7 @@
               (flycheck-mode 0))))
 
 (use-package c-ts-mode
+  :ensure nil
   :defer t
-  :if (treesit-language-available-p 'c)
   :custom
-  (c-ts-mode-indent-offset 4)
-  :init
-  ;; Remap the standard C/C++ modes
-  (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(c-or-c++-mode . c-or-c++-ts-mode)))
+  (c-ts-mode-indent-offset 4))
