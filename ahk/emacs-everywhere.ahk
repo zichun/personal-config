@@ -55,24 +55,25 @@ EmacsEverywhere(*) {
     try FileDelete meta
     FileAppend hwnd "`n" cls "`n" title "`n" x " " y " " w " " h "`n", meta, "UTF-8-RAW"
 
-    ; Choose editor:
-    ;   1. If either neomacs or emacs is running, use the running one.
-    ;   2. Otherwise, if neomacs is installed, use neomacs.
-    ;   3. Otherwise, fall back to emacs.
+    ; Choose editor (emacs-everywhere requires a working Emacs server):
+    ;   1. If neomacs is running with a live server, use neomacsclient.
+    ;   2. Else if emacs is running, use emacsclientw.
+    ;   3. Else if neither is running, neomacs is installed, and neomacs supports server sockets, launch neomacs.
+    ;   4. Otherwise (including when Neomacs on Windows cannot start a server due to :reuseaddr), fall back to emacsclientw.
     neomacsRunning := ProcessExist("neomacs.exe")
     emacsRunning   := ProcessExist("emacs.exe")
-    if neomacsRunning {
+    if neomacsRunning && ServerBelongsTo(SERVER_FILE, "neomacs.exe") {
         useNeomacs := true
         needsLaunch := false
     } else if emacsRunning {
         useNeomacs := false
         needsLaunch := false
-    } else if FileExist(NEOMACS_EXE) {
+    } else if !neomacsRunning && FileExist(NEOMACS_EXE) && NeomacsSupportsServer() {
         useNeomacs := true
         needsLaunch := true
     } else {
         useNeomacs := false
-        needsLaunch := true
+        needsLaunch := false
     }
 
     try {
@@ -131,4 +132,32 @@ HasValue(arr, v) {
         if (x = v)   ; case-insensitive
             return true
     return false
+}
+
+ServerBelongsTo(serverFile, exeName) {
+    if !FileExist(serverFile)
+        return false
+    try {
+        content := FileRead(serverFile, "UTF-8")
+        if RegExMatch(content, "^\S+\s+(\d+)", &m) {
+            pid := Integer(m[1])
+            return ProcessExist(pid) && (ProcessGetName(pid) = exeName)
+        }
+    }
+    return false
+}
+
+NeomacsSupportsServer() {
+    static cachedMtime := ""
+    static cachedResult := false
+    if !FileExist(NEOMACS_EXE)
+        return false
+    mtime := FileGetTime(NEOMACS_EXE, "M")
+    if (mtime = cachedMtime)
+        return cachedResult
+    probe := "(condition-case nil (progn (delete-process (make-network-process :name (symbol-name 'p) :server t :family 'ipv4 :service t :host 'local)) (kill-emacs 0)) (error (kill-emacs 1)))"
+    exitCode := RunWait('"' NEOMACS_EXE '" -Q --batch --eval "' probe '"', , "Hide")
+    cachedMtime := mtime
+    cachedResult := (exitCode = 0)
+    return cachedResult
 }

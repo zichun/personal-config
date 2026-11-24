@@ -108,29 +108,31 @@ function e {
     }
 }
 
-function emacs {
-    param([Parameter(ValueFromRemainingArguments)]$Arguments)
+function Test-EmacsServerProcess {
+    param(
+        [Parameter(Mandatory)]
+        [string]$ServerFile,
+        [Parameter(Mandatory)]
+        [string]$ProcessName
+    )
+    if (-not (Test-Path -LiteralPath $ServerFile)) {
+        return $false;
+    }
+    $firstLine = Get-Content -LiteralPath $ServerFile -TotalCount 1 -ErrorAction SilentlyContinue;
+    if ($firstLine -match '^\S+\s+(\d+)\s*$') {
+        $proc = Get-Process -Id ([int]$Matches[1]) -ErrorAction SilentlyContinue;
+        return ($null -ne $proc -and $proc.Name -ieq $ProcessName);
+    }
+    return $false;
+}
 
-    if ($env:OS -eq 'Windows_NT') {
-        $neomacsDir = 'C:\tools\neomacs';
-        $neomacsExe = Join-Path $neomacsDir 'neomacs.exe';
-        if (Test-Path -LiteralPath $neomacsExe) {
-            $neomacsClient = Join-Path $neomacsDir 'neomacsclient.exe';
-            $runNeomacs = Join-Path $neomacsDir 'runneomacs.exe';
-            $homeDir = if ($env:HOME) { $env:HOME } else { $env:USERPROFILE };
-            $serverFile = Join-Path $homeDir '.emacs.d\server\server';
-
-            if ($Arguments -and $Arguments.Count -gt 0) {
-                & $neomacsClient -f $serverFile -n --alternate-editor="$runNeomacs" @Arguments;
-                return;
-            }
-
-            $neomacs = Get-Process -Name 'neomacs' -ErrorAction SilentlyContinue |
-                Where-Object { $_.MainWindowHandle -ne 0 } |
-                Select-Object -First 1;
-            if ($neomacs) {
-                if (-not ('WinAp' -as [type])) {
-                    Add-Type @"
+function Focus-WindowHandle {
+    param(
+        [Parameter(Mandatory)]
+        [IntPtr]$Handle
+    )
+    if (-not ('WinAp' -as [type])) {
+        Add-Type @"
 using System;
 using System.Runtime.InteropServices;
 public class WinAp {
@@ -143,10 +145,62 @@ public class WinAp {
     public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 }
 "@
+    }
+    [void] [WinAp]::SetForegroundWindow($Handle);
+}
+
+function emacs {
+    param([Parameter(ValueFromRemainingArguments)]$Arguments)
+
+    if ($env:OS -eq 'Windows_NT') {
+        $neomacsDir = 'C:\tools\neomacs';
+        $neomacsExe = Join-Path $neomacsDir 'neomacs.exe';
+        $neomacsClient = Join-Path $neomacsDir 'neomacsclient.exe';
+        $runNeomacs = Join-Path $neomacsDir 'runneomacs.exe';
+        $homeDir = if ($env:HOME) { $env:HOME } else { $env:USERPROFILE };
+        $serverFile = Join-Path $homeDir '.emacs.d\server\server';
+
+        $neomacsRunning = @(Get-Process -Name 'neomacs' -ErrorAction SilentlyContinue);
+        $emacsRunning = @(Get-Process -Name 'emacs' -ErrorAction SilentlyContinue);
+
+        if ($neomacsRunning.Count -gt 0) {
+            if ($Arguments -and $Arguments.Count -gt 0) {
+                if (Test-EmacsServerProcess -ServerFile $serverFile -ProcessName 'neomacs') {
+                    & $neomacsClient -f $serverFile -n --alternate-editor="$runNeomacs" @Arguments;
+                } else {
+                    & $runNeomacs @Arguments;
                 }
-                [void] [WinAp]::SetForegroundWindow($neomacs.MainWindowHandle);
             } else {
-                Start-Process -FilePath $runNeomacs;
+                $gui = $neomacsRunning | Where-Object { $_.MainWindowHandle -ne 0 } | Select-Object -First 1;
+                if ($gui) {
+                    Focus-WindowHandle -Handle $gui.MainWindowHandle;
+                } else {
+                    & $runNeomacs;
+                }
+            }
+            return;
+        }
+
+        if ($emacsRunning.Count -gt 0) {
+            if ($Arguments -and $Arguments.Count -gt 0) {
+                emacsclientw.exe -n --no-wait --alternate-editor="runemacs.exe" @Arguments;
+            } else {
+                $gui = $emacsRunning | Where-Object { $_.MainWindowHandle -ne 0 } | Select-Object -First 1;
+                if ($gui) {
+                    Focus-WindowHandle -Handle $gui.MainWindowHandle;
+                } else {
+                    emacsclientw.exe -c -n --no-wait --alternate-editor="runemacs.exe";
+                }
+            }
+            return;
+        }
+
+        # Neither is running: prioritize Neomacs if installed, otherwise fall back to Emacs.
+        if (Test-Path -LiteralPath $neomacsExe) {
+            if ($Arguments -and $Arguments.Count -gt 0) {
+                & $runNeomacs @Arguments;
+            } else {
+                & $runNeomacs;
             }
             return;
         }
@@ -154,31 +208,6 @@ public class WinAp {
         if ($Arguments -and $Arguments.Count -gt 0)
         {
             emacsclientw.exe -n --no-wait --alternate-editor="runemacs.exe" @Arguments;
-            return;
-        }
-
-        $emacs = Get-Process -Name 'emacs' -ErrorAction SilentlyContinue |
-            Where-Object { $_.MainWindowHandle -ne 0 } |
-            Select-Object -First 1;
-        if ($emacs)
-        {
-            if (-not ('WinAp' -as [type])) {
-                Add-Type @"
-using System;
-using System.Runtime.InteropServices;
-public class WinAp {
-    [DllImport("user32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool SetForegroundWindow(IntPtr hWnd);
-
-    [DllImport("user32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-}
-"@
-            }
-            $h = $emacs.MainWindowHandle;
-            [void] [WinAp]::SetForegroundWindow($h);
         }
         else
         {
