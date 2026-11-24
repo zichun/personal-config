@@ -29,7 +29,15 @@
               (condition-case err
                   (unless (server-running-p)
                     (server-start))
-                (error (message "Emacs server failed to start: %s" (error-message-string err)))))))
+                (error
+                 ;; Neomacs on Windows currently fails `make-network-process :server t'
+                 ;; with "Unsupported network option :reuseaddr"; suppress that noise so
+                 ;; startup stays clean and auto-recovers once Neomacs fixes it upstream.
+                 (unless (and (eq system-type 'windows-nt)
+                              (featurep 'neomacs)
+                              (equal (error-message-string err)
+                                     "Unsupported network option :reuseaddr"))
+                   (message "Emacs server failed to start: %s" (error-message-string err))))))))
 
 ;; Work around Neomacs Windows `group-name' throwing "Invalid GID specification" instead of returning nil
 (when (and (eq system-type 'windows-nt)
