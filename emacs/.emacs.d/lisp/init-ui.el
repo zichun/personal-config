@@ -51,8 +51,7 @@
                       (_ "Monospace"))))
   (if window-system
       (unless (equal (face-attribute 'default :family) desired-font)
-        (set-face-attribute 'default nil :font desired-font)
-        (set-face-attribute 'default nil :height 125))
+        (set-face-attribute 'default nil :family desired-font :height 125))
     (set-face-attribute 'default nil :height 125)))
 (when window-system
   (setq-default line-spacing 3))
