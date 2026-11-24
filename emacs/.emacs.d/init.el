@@ -89,6 +89,31 @@
 
 (desktop-save-mode 1)
 
+(defun zc/frameset--offset-pos (pos delta)
+  "Offset positional frame parameter POS by DELTA pixels."
+  (pcase pos
+    (`(+ ,n) (list '+ (+ n delta)))
+    (`(- ,n) (list '- (- n delta)))
+    ((pred numberp) (+ pos delta))
+    (_ delta)))
+
+(with-eval-after-load 'frameset
+  ;; `frameset--restore-frame' adds `dx'/`dy' directly to `(frame-parameter frame 'left)'
+  ;; and `'top' when `tty-to-GUI' is non-nil, which signals `number-or-marker-p' when
+  ;; Windows stores negative offsets as `(+ -8)'.
+  (advice-add 'frameset--restore-frame :around
+              (lambda (orig parameters window-state filters force-onscreen &optional dx dy)
+                (if (and (frameset-switch-to-gui-p parameters)
+                         (numberp dx) (numberp dy))
+                    (let ((frame (funcall orig parameters window-state filters force-onscreen nil nil)))
+                      (when (and (frame-live-p frame) (or (/= dx 0) (/= dy 0)))
+                        (modify-frame-parameters
+                         frame
+                         `((left . ,(zc/frameset--offset-pos (frame-parameter frame 'left) dx))
+                           (top  . ,(zc/frameset--offset-pos (frame-parameter frame 'top) dy)))))
+                      frame)
+                  (funcall orig parameters window-state filters force-onscreen dx dy)))))
+
 ;; Load modular configs
 (require 'init-packages)
 (require 'init-ui)

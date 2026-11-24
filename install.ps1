@@ -159,6 +159,73 @@ function Install-Emacs {
     [Environment]::SetEnvironmentVariable('HOME', $env:USERPROFILE, [EnvironmentVariableTarget]::Machine);
 }
 
+function Install-Neomacs {
+    $installDir = 'C:\tools\neomacs';
+    $neomacsExe = Join-Path $installDir 'neomacs.exe';
+    $releaseUrl = 'https://api.github.com/repos/eval-exec/neomacs/releases/latest';
+    $headers = @{ 'User-Agent' = 'PowerShell' };
+
+    $release = (Invoke-WebRequest -Uri $releaseUrl -Headers $headers -UseBasicParsing).Content |
+        ConvertFrom-Json;
+
+    $latestVersion = if ($release.tag_name) { $release.tag_name.TrimStart('v') } else { $null };
+    if ($latestVersion -and (Test-Path -LiteralPath $neomacsExe)) {
+        $currentVersionLine = (& $neomacsExe --version 2>$null | Select-Object -First 1);
+        if ($currentVersionLine -match [regex]::Escape($latestVersion)) {
+            Write-Host "Neomacs $latestVersion is already installed.";
+            Add-MachinePath -PathEntry $installDir;
+            return;
+        }
+    }
+
+    $arch = if ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64') { 'aarch64' } else { 'x86_64' };
+    $assetUrl = $release.assets |
+        Where-Object { $_.name -like "neomacs-*-$arch-pc-windows-msvc.zip" } |
+        Select-Object -First 1 -ExpandProperty 'browser_download_url';
+
+    if (-not $assetUrl) {
+        Write-Warning "Could not locate Neomacs Windows ($arch) release zip.";
+        return;
+    }
+
+    $zipPath = Join-Path $env:TEMP 'neomacs.zip';
+    $extractPath = Join-Path $env:TEMP 'neomacs-extract';
+    try {
+        if (Test-Path -LiteralPath $extractPath) {
+            Remove-Item -LiteralPath $extractPath -Recurse -Force;
+        }
+        Invoke-WebRequest -Uri $assetUrl -Headers $headers -OutFile $zipPath -UseBasicParsing;
+        Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force;
+
+        $sourceDir = $extractPath;
+        if (-not (Test-Path -LiteralPath (Join-Path $extractPath 'neomacs.exe'))) {
+            $nestedDir = Get-ChildItem -LiteralPath $extractPath -Directory |
+                Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName 'neomacs.exe') } |
+                Select-Object -First 1;
+            if ($nestedDir) {
+                $sourceDir = $nestedDir.FullName;
+            }
+        }
+
+        $toolsRoot = Split-Path -Path $installDir -Parent;
+        if (-not (Test-Path -LiteralPath $toolsRoot)) {
+            New-Item -ItemType Directory -Path $toolsRoot -Force | Out-Null;
+        }
+        if (Test-Path -LiteralPath $installDir) {
+            Remove-Item -LiteralPath $installDir -Recurse -Force;
+        }
+        Copy-Item -LiteralPath $sourceDir -Destination $installDir -Recurse -Force;
+        Add-MachinePath -PathEntry $installDir;
+    } finally {
+        if (Test-Path -LiteralPath $zipPath) {
+            Remove-Item -LiteralPath $zipPath -Force;
+        }
+        if (Test-Path -LiteralPath $extractPath) {
+            Remove-Item -LiteralPath $extractPath -Recurse -Force;
+        }
+    }
+}
+
 function Install-Packages {
     $packages = @(
         'Microsoft.VisualStudioCode',
@@ -397,6 +464,7 @@ function Invoke-Install {
     Install-Fonts;
     Install-Packages;
     Install-Emacs;
+    Install-Neomacs;
     Install-Pwsh;
     Install-Rust;
     Install-Ripgrep;

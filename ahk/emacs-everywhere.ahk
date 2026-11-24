@@ -7,7 +7,13 @@
 #SingleInstance Force
 
 ; ---- config ---------------------------------------------------------------
-EMACSCLIENTW      := "emacsclientw.exe"   ; full path if not on PATH, e.g. "C:\Program Files\Emacs\emacs-30.2\bin\emacsclientw.exe"
+NEOMACS_DIR       := "C:\tools\neomacs"
+NEOMACS_EXE       := NEOMACS_DIR "\neomacs.exe"
+RUNNEOMACS_EXE    := NEOMACS_DIR "\runneomacs.exe"
+NEOMACSCLIENT_EXE := NEOMACS_DIR "\neomacsclient.exe"
+EMACSCLIENTW      := "emacsclientw.exe"   ; full path if not on PATH, e.g. "C:\Program Files\Emacs\emacs-31.1\bin\emacsclientw.exe"
+SERVER_FILE       := (EnvGet("HOME") ? EnvGet("HOME") : EnvGet("USERPROFILE")) "\.emacs.d\server\server"
+SERVER_WAIT_MS    := 15000                ; max ms to wait for freshly launched Neomacs server
 TMP_DIR           := A_Temp               ; must equal Emacs's `temporary-file-directory` (default: %TEMP%)
 RESTORE_CLIPBOARD := true                 ; put the old clipboard back after pasting
 COPY_TIMEOUT      := 0.3                  ; seconds to wait for Ctrl+C to produce a selection
@@ -49,13 +55,51 @@ EmacsEverywhere(*) {
     try FileDelete meta
     FileAppend hwnd "`n" cls "`n" title "`n" x " " y " " w " " h "`n", meta, "UTF-8-RAW"
 
+    ; Choose editor:
+    ;   1. If either neomacs or emacs is running, use the running one.
+    ;   2. Otherwise, if neomacs is installed, use neomacs.
+    ;   3. Otherwise, fall back to emacs.
+    neomacsRunning := ProcessExist("neomacs.exe")
+    emacsRunning   := ProcessExist("emacs.exe")
+    if neomacsRunning {
+        useNeomacs := true
+        needsLaunch := false
+    } else if emacsRunning {
+        useNeomacs := false
+        needsLaunch := false
+    } else if FileExist(NEOMACS_EXE) {
+        useNeomacs := true
+        needsLaunch := true
+    } else {
+        useNeomacs := false
+        needsLaunch := true
+    }
+
     try {
-        ; -c new frame; -a "" starts the daemon if it isn't running.
-        ; Blocks until the buffer is finished (C-c C-c) or aborted (C-c C-k).
-        RunWait '"' EMACSCLIENTW '" -c -a "" "' file '"'
+        if useNeomacs {
+            if needsLaunch {
+                ; neomacsclient on Windows requires a TCP server file and does not support `-a ""`.
+                try FileDelete SERVER_FILE
+                Run '"' (FileExist(RUNNEOMACS_EXE) ? RUNNEOMACS_EXE : NEOMACS_EXE) '"'
+                deadline := A_TickCount + SERVER_WAIT_MS
+                while !FileExist(SERVER_FILE) && A_TickCount < deadline
+                    Sleep 200
+                if !FileExist(SERVER_FILE)
+                    throw Error("Timed out waiting for Neomacs server file: " SERVER_FILE)
+            }
+            ; -c new frame; -f TCP server file; Hide suppresses neomacsclient's console window.
+            exitCode := RunWait('"' NEOMACSCLIENT_EXE '" -f "' SERVER_FILE '" -c "' file '"', , "Hide")
+            if (exitCode != 0)
+                throw Error("neomacsclient exited with code " exitCode)
+        } else {
+            ; -c new frame; -a "" starts the daemon if it isn't running.
+            ; Blocks until the buffer is finished (C-c C-c) or aborted (C-c C-k).
+            RunWait '"' EMACSCLIENTW '" -c -a "" "' file '"'
+        }
     } catch as e {
-        MsgBox "emacsclientw failed: " e.Message, "emacs-everywhere"
+        MsgBox (useNeomacs ? "neomacsclient" : "emacsclientw") " failed: " e.Message, "emacs-everywhere"
         A_Clipboard := saved
+        try FileDelete meta
         return
     }
 

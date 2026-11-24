@@ -82,41 +82,55 @@ function Import-CustomScripts {
 }
 
 function em {
-    param($p1, $p2, $p3, $p4)
+    param([Parameter(ValueFromRemainingArguments)]$Arguments)
     if ($env:OS -eq 'Windows_NT') {
-        emacs $p1 $p2 $p3 $p4;
+        emacs @Arguments;
     } else {
-        if (Get-Process emacs) {
-            emacsclientw -n --no-wait $p1 $p2 $p3 $p4;
+        if (Get-Process emacs -ErrorAction SilentlyContinue) {
+            emacsclientw -n --no-wait @Arguments;
         } else {
-            emacs $p1 $p2 $p3 $p4;
+            emacs @Arguments;
         }
     }
 }
 
 function e {
-    param($p1, $p2, $p3, $p4)
+    param([Parameter(ValueFromRemainingArguments)]$Arguments)
     if ($env:OS -eq 'Windows_NT') {
-        emacs.exe -nw $p1 $p2 $p3 $p4;
+        $neomacsExe = 'C:\tools\neomacs\neomacs.exe';
+        if (Test-Path -LiteralPath $neomacsExe) {
+            & $neomacsExe -nw @Arguments;
+        } else {
+            emacs.exe -nw @Arguments;
+        }
     } else {
-        emacs -nw $p1 $p2 $p3 $p4;
+        emacs -nw @Arguments;
     }
 }
 
 function emacs {
-    param($p1, $p2, $p3, $p4)
+    param([Parameter(ValueFromRemainingArguments)]$Arguments)
 
     if ($env:OS -eq 'Windows_NT') {
-        if ($p1)
-        {
-            emacsclientw.exe -n --no-wait --alternate-editor="runemacs.exe" $p1 $p2 $p3 $p4;
-            return;
-        }
+        $neomacsDir = 'C:\tools\neomacs';
+        $neomacsExe = Join-Path $neomacsDir 'neomacs.exe';
+        if (Test-Path -LiteralPath $neomacsExe) {
+            $neomacsClient = Join-Path $neomacsDir 'neomacsclient.exe';
+            $runNeomacs = Join-Path $neomacsDir 'runneomacs.exe';
+            $homeDir = if ($env:HOME) { $env:HOME } else { $env:USERPROFILE };
+            $serverFile = Join-Path $homeDir '.emacs.d\server\server';
 
-        $emacs = Get-Process | Where-Object {$_.Name -like "emacs"};
-        if ($emacs)
-        {
-            Add-Type @"
+            if ($Arguments -and $Arguments.Count -gt 0) {
+                & $neomacsClient -f $serverFile -n --alternate-editor="$runNeomacs" @Arguments;
+                return;
+            }
+
+            $neomacs = Get-Process -Name 'neomacs' -ErrorAction SilentlyContinue |
+                Where-Object { $_.MainWindowHandle -ne 0 } |
+                Select-Object -First 1;
+            if ($neomacs) {
+                if (-not ('WinAp' -as [type])) {
+                    Add-Type @"
 using System;
 using System.Runtime.InteropServices;
 public class WinAp {
@@ -129,6 +143,40 @@ public class WinAp {
     public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 }
 "@
+                }
+                [void] [WinAp]::SetForegroundWindow($neomacs.MainWindowHandle);
+            } else {
+                Start-Process -FilePath $runNeomacs;
+            }
+            return;
+        }
+
+        if ($Arguments -and $Arguments.Count -gt 0)
+        {
+            emacsclientw.exe -n --no-wait --alternate-editor="runemacs.exe" @Arguments;
+            return;
+        }
+
+        $emacs = Get-Process -Name 'emacs' -ErrorAction SilentlyContinue |
+            Where-Object { $_.MainWindowHandle -ne 0 } |
+            Select-Object -First 1;
+        if ($emacs)
+        {
+            if (-not ('WinAp' -as [type])) {
+                Add-Type @"
+using System;
+using System.Runtime.InteropServices;
+public class WinAp {
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool SetForegroundWindow(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+}
+"@
+            }
             $h = $emacs.MainWindowHandle;
             [void] [WinAp]::SetForegroundWindow($h);
         }
@@ -138,12 +186,12 @@ public class WinAp {
         }
     } else {
         if (Test-Path '/usr/bin/emacs') {
-            . '/usr/bin/emacs' $p1 $p2 $p3 $p4;
+            . '/usr/bin/emacs' @Arguments;
         } elseif (Test-Path '/usr/local/bin/emacs') {
             if (Get-Process Emacs* -ErrorAction SilentlyContinue) {
-                . '/usr/local/bin/emacsclient' $p1 $p2 $p3 $p4;
+                . '/usr/local/bin/emacsclient' @Arguments;
             } else {
-                . '/usr/local/bin/emacs' $p1 $p2 $p3 $p4;
+                . '/usr/local/bin/emacs' @Arguments;
             }
         } else {
             Write-Warning 'Cannot find emacs';
